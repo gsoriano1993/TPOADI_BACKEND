@@ -5,7 +5,7 @@ module.exports = {
         return receta
             .create({
                 idUsuario: req.body.idUsuario,
-                nombre: req.body.descripcion,
+                nombre: req.body.nombre,
                 descripcion: req.body.descripcion,
                 foto: req.body.foto,
                 porciones: req.body.porciones,
