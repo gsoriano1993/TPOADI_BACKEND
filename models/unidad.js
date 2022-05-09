@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'unidad',
+    tableName:'unidades'
   }, {
     freezeTableName: true
 });

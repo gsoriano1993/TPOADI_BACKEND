@@ -12,23 +12,23 @@ module.exports = {
                 cantidadPersonas:req.body.cantidadPersonas,
                 idTipo: req.body.idTipo  
             })
-            .then(tipo => res.status(200).send(receta))
+            .then(receta => res.status(200).send(receta))
             .catch(error => res.status(400).send(error))
     },
     list(_, res) {
-        return tipo.findAll({
-            attributes : ['idTipo',  'descripcion']
+        return receta.findAll({
+            attributes : ['nombre',  'descripcion', 'foto', 'porciones', 'cantidadPersonas']
         })
-            .then(tipo => res.status(200).send(receta))
+            .then(receta => res.status(200).send(receta))
             .catch(error => res.status(400).send(error))
     },
     find(req, res) {
         return receta.findAll({
             where: {
-                username: req.params.username,
+                username: req.params.idUsuario,
             }
         })
-            .then(tipo => res.status(200).send(receta))
+            .then(receta => res.status(200).send(receta))
             .catch(error => res.status(400).send(error))
     },
 };

@@ -25,7 +25,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'receta',
-  }, {
+    tableName:'recetas'
+  },
+   {
     freezeTableName: true
 });
 receta.removeAttribute('id');

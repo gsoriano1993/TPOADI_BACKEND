@@ -11,4 +11,5 @@ module.exports = (app) => {
    app.get('/api/usuario/list', usuarioController.list);
    app.get('/api/usuario/find/username/:username', usuarioController.find);
    app.get('/api/tipo/list', tipoController.list);
+   app.get('/api/receta/list', recetaController.list);
 };
