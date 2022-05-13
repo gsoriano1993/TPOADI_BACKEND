@@ -25,10 +25,21 @@ module.exports = {
     find(req, res) {
         return receta.findAll({
             where: {
-                username: req.params.idUsuario,
-            }
+                nombre: req.params.nombre,
+            },
+            order: [ req.body.nombre, "ASC"]  //por defecto ordeno por nombre
+            
         })
             .then(receta => res.status(200).send(receta))
             .catch(error => res.status(400).send(error))
     },
+    destroy(req, res){
+        return receta.destroy({
+            where: {
+                nombre: req.param.nombre,
+            }
+        })
+            .then(receta => res.status(200).send(receta))
+            .catch(error => res.status(400).send(error))
+        }
 };
