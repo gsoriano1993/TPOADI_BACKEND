@@ -11,7 +11,7 @@ module.exports = {
       mail:{
         type: Sequelize.STRING(150),
        references: {
-         model:"usuario",
+         model:"usuarios",
          key:"mail"
        }
       },
