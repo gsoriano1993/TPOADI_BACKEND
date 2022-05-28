@@ -22,13 +22,16 @@ module.exports = {
     },
     find(req, res) {
         return usuario.findAll({
+            attributes: ['idUsuario'], 
+            //aca tengo que ir a buscar el codigo
             where: {
-                username: req.params.username,
+                mail: req.params.mail,
             }
-        })
-            .then(usuario => res.status(200).send(usuario))
+        })  
+            .then (usuario => res.status(200).send(usuario))
             .catch(error => res.status(400).send(error))
     },
+
 };
 
 

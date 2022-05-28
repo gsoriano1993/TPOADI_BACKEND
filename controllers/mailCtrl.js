@@ -1,9 +1,15 @@
+const req = require('express/lib/request');
 var nodemailer = require('nodemailer');
 var randomExt = require('random-ext');
-var codigoReg= randomExt.integer(999999,100000 );
+const controllerUsuario = require('./controllerUsuario');
+var codigoReg = 123765//randomExt.integer(999999, 100000);
+var validadorReg= require('../models').validador;
+const varEmail= "123gabrielsoriano39@gmail.com";//req.body.email;
+const funcAux= require('../controllers/funciones');
+
 // email sender function
-exports.sendEmail = function(req, res){
-// Definimos el transporter
+exports.sendEmail = function (req, res) {
+    // Definimos el transporter
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
@@ -11,21 +17,23 @@ exports.sendEmail = function(req, res){
             pass: 'Claudiogodio69'
         }
     });
-// Definimos el email
-var mailOptions = {
-    from: 'Recetips',
-    to: 'lulirodriguez@live.com',
-    subject: 'Alta de usuario',
-    text: 'Hola! El valor que debés ingresar para finalizar el registro es '+ codigoReg
-};
-// Enviamos el email
-transporter.sendMail(mailOptions, function(error, info){
-    if (error){
-        console.log(error);
-        res.send(500, err.message);
-    } else {
-        console.log("Correo enviado");
-        res.status(200).jsonp(req.body);
-    }
-});
+    // Definimos el email
+    var mailOptions = {
+        from: 'Recetips',
+        to: varEmail,
+        subject: 'Alta de usuario',
+        text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+    };
+    // Enviamos el email
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          //  console.log(error);
+            res.send(500, err.message);
+        } else {
+            console.log("Correo enviado");
+            res.status(200).jsonp(req.body);
+            funcAux.cargarCodigo(varEmail, codigoReg);
+            codigoReg = randomExt.integer(999999, 100000);
+        }
+    });
 };

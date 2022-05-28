@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "gabriel123",
-    "database": "adi2",
+    "database": "adi",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {
@@ -12,7 +12,7 @@
   "test": {
     "username": "root",
     "password": "gabriel123",
-    "database": "adi2",
+    "database": "adi",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {
@@ -22,7 +22,7 @@
   "production": {
     "username": "root",
     "password": "gabriel123",
-    "database": "adi2",
+    "database": "adi",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {

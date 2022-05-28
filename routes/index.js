@@ -3,7 +3,7 @@ const usuarioController = require('../controllers/controllerUsuario');
 const tipoController = require('../controllers/controllerTipo');
 const recetaController = require('../controllers/controllerReceta');
 const logeoController = require('../controllers/controllerLogeo');
-
+const validadorController =require('../controllers/controllerValidador');
 
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
@@ -23,6 +23,10 @@ module.exports = (app) => {
    app.get('/receta/list', recetaController.list);
    app.get('/receta/buscar/:nombre', recetaController.find);
    app.delete('/receta/eliminar/:nombre', recetaController.destroy);
+   app.post('/usuario/create/receta', recetaController.create);
+
+   //registro
+   //app.post('/usuario/create/tipo', validadorController.EmailCtrl); //generar aca el controller del validador
 
    //tipo
    app.post('/usuario/create/tipo', tipoController.create);
@@ -30,8 +34,7 @@ module.exports = (app) => {
 
    //usuario
    app.get('/usuario/list', usuarioController.list);
-   app.get('/usuario/find/username/:username', usuarioController.find);
-   app.post('/usuario/create/receta', recetaController.create);
+   app.get('/usuario/find/user/:mail', usuarioController.find);
 
    //email
    var EmailCtrl = require('../controllers/mailCtrl')
