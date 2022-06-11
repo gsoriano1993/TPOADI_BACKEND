@@ -1,29 +1,29 @@
 {
   "development": {
-    "username": "root",
-    "password": "gabriel123",
+    "username": "grupo3",
+    "password": "grupo3adi",
     "database": "adi",
-    "host": "127.0.0.1",
+    "host": "rds-mysql-adi.cbdzoazvrm9s.us-east-1.rds.amazonaws.com",
     "dialect": "mysql",
     "define": {
       "timestamps": false
   }
   },
   "test": {
-    "username": "root",
-    "password": "gabriel123",
+    "username": "grupo3",
+    "password": "grupo3adi",
     "database": "adi",
-    "host": "127.0.0.1",
+    "host": "rds-mysql-adi.cbdzoazvrm9s.us-east-1.rds.amazonaws.com",
     "dialect": "mysql",
     "define": {
       "timestamps": false
   }
   },
   "production": {
-    "username": "root",
-    "password": "gabriel123",
+    "username": "grupo3",
+    "password": "grupo3adi",
     "database": "adi",
-    "host": "127.0.0.1",
+    "host": "rds-mysql-adi.cbdzoazvrm9s.us-east-1.rds.amazonaws.com",
     "dialect": "mysql",
     "define": {
       "timestamps": false
