@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 require('./routes')(app);
 /*sequelize.sync({force: false})
-.then (() =>{
+.then (() =>{ 
      console.log("tablas sincronizadas")
 }); */
 const port = parseInt(process.env.PORT, 10) || 8000;

@@ -13,8 +13,8 @@ const jwt = require('jwt-simple');
 
 
 module.exports = (app) => {
-   app.get('/', (req, res) => res.status(200).send({
-      message: 'Direccion incorrecta',
+   app.get('', (req, res) => res.status(200).send({
+      message: 'Direccion incorrecta!!',
    }));
 
    app.post('/usuario/create/logeo', logeoController.create)
