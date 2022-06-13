@@ -15,6 +15,7 @@ module.exports = {
             .then(receta => res.status(200).send(receta))
             .catch(error => res.status(400).send(error))
     },
+    
     list(_, res) {
         return receta.findAll({
             attributes : ['nombre',  'descripcion', 'foto', 'porciones', 'cantidadPersonas']
