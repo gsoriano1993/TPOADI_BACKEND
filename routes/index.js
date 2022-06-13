@@ -1,9 +1,9 @@
 /* Controllers */
-const usuarioController = require('./controllers/controllerUsuario');
-const tipoController = require('./controllers/controllerTipo');
-const recetaController = require('./controllers/controllerReceta');
-const logeoController = require('./controllers/controllerLogeo');
-const validadorController =require('./controllers/controllerValidador');
+const usuarioController = require('../controllers/controllerUsuario');
+const tipoController = require('../controllers/controllerTipo');
+const recetaController = require('../controllers/controllerReceta');
+const logeoController = require('../controllers/controllerLogeo');
+const validadorController =require('../controllers/controllerValidador');
 
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
@@ -37,7 +37,7 @@ module.exports = (app) => {
    app.get('/usuario/find/user/:mail', usuarioController.find);
 
    //email
-   var EmailCtrl = require('./controllers/mailCtrl')
+   var EmailCtrl = require('../controllers/mailCtrl')
    
    //email router
    app.post('/email', EmailCtrl.sendEmail);
