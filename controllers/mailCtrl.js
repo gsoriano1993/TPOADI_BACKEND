@@ -10,10 +10,15 @@ var codigoReg = 123765//randomExt.integer(999999, 100000);
 exports.sendEmail = function (req, res) {
     // Definimos el transporter
     var transporter = nodemailer.createTransport({
-        service: 'Gmail',
+        host: "smtp-mail.outlook.com", // hostname
+        port: 587, // port for secure SMTP
+        secureConnection: false,
+        tls: {
+           ciphers:'SSLv3'
+        },
         auth: {
-            user: 'soportebyrecetips@gmail.com',
-            pass: 'Claudiogodio69'
+            user: 'gabrielsoriano.-@hotmail.com',
+            pass: 'Gabriel199325.'
         }
     });
     // Definimos el email
@@ -26,11 +31,12 @@ exports.sendEmail = function (req, res) {
     // Enviamos el email
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          //  console.log(error);
-            res.send(500, err.message);
+         console.log(error);
+         res.status(200)
         } else {
             console.log("Correo enviado");
-            res.status(200).jsonp(req.body);
+        res.status(500)
+
         }
          /*   funcAux.cargarCodigo(req.body.mail, codigoReg);
             codigoReg = randomExt.integer(999999, 100000);
