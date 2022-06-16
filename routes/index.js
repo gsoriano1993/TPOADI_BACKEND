@@ -13,7 +13,7 @@ const jwt = require('jwt-simple');
 
 
 module.exports = (app) => {
-   app.get('', (req, res) => res.status(200).send({
+   app.get('/', (req, res) => res.status(200).send({
       message: 'Direccion incorrecta!!',
    }));
 
