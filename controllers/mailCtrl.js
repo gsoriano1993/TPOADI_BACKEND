@@ -3,8 +3,8 @@ var nodemailer = require('nodemailer');
 var randomExt = require('random-ext');
 const controllerUsuario = require('./controllerUsuario');
 var codigoReg = 123765//randomExt.integer(999999, 100000);
-var validadorReg= require('../models').validador;
-const funcAux= require('../controllers/funciones');
+//var validadorReg= require('../models').validador;
+//const funcAux= require('../controllers/funciones');
 
 // email sender function
 exports.sendEmail = function (req, res) {
@@ -28,11 +28,11 @@ exports.sendEmail = function (req, res) {
         if (error) {
           //  console.log(error);
             res.send(500, err.message);
-        } else {
+        }/* else {
             console.log("Correo enviado");
             res.status(200).jsonp(req.body);
             funcAux.cargarCodigo(req.body.mail, codigoReg);
             codigoReg = randomExt.integer(999999, 100000);
-        }
+        }*/
     });
 };
