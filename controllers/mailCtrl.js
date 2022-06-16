@@ -19,7 +19,7 @@ exports.sendEmail = function (req, res) {
     // Definimos el email
     var mailOptions = {
         from: 'Recetips',
-        to: req.body.email,
+        to: req.body.mail,
         subject: 'Alta de usuario',
         text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
     };
@@ -31,7 +31,7 @@ exports.sendEmail = function (req, res) {
         } else {
             console.log("Correo enviado");
             res.status(200).jsonp(req.body);
-            funcAux.cargarCodigo(varEmail, codigoReg);
+            funcAux.cargarCodigo(req.body.mail, codigoReg);
             codigoReg = randomExt.integer(999999, 100000);
         }
     });
