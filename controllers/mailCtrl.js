@@ -2,7 +2,7 @@ const req = require('express/lib/request');
 var nodemailer = require('nodemailer');
 var randomExt = require('random-ext');
 const controllerUsuario = require('./controllerUsuario');
-var codigoReg = 123765//randomExt.integer(999999, 100000);
+var codigoReg = randomExt.integer(999999, 100000);
 //var validadorReg= require('../models').validador;
 //const funcAux= require('../controllers/funciones');
 
@@ -32,11 +32,9 @@ exports.sendEmail = function (req, res) {
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
          console.log(error);
-         res.status(200)
+         res.status(500).send("error en el envio")
         } else {
-            console.log("Correo enviado");
-        res.status(500)
-
+        res.status(200).send("correo enviado")
         }
          /*   funcAux.cargarCodigo(req.body.mail, codigoReg);
             codigoReg = randomExt.integer(999999, 100000);
