@@ -42,7 +42,7 @@ require('./routes')(app);
 .then (() =>{ 
      console.log("tablas sincronizadas")
 }); */
-const port = parseInt(process.env.PORT, 10) || 8000;
+const port = process.env.PORT || 8000;
 app.set('port', port);
 const server = http.createServer(app);
 server.listen(port);
