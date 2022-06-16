@@ -1,5 +1,6 @@
 /* Controllers */
 const usuarioController = require('../controllers/controllerUsuario');
+const logeoController = require('../controllers/controllerLogeo');
 const tipoController = require('../controllers/controllerTipo');
 const recetaController = require('../controllers/controllerReceta');
 const logeoController = require('../controllers/controllerLogeo');
