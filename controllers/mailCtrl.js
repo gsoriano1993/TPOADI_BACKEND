@@ -4,7 +4,6 @@ var randomExt = require('random-ext');
 const controllerUsuario = require('./controllerUsuario');
 var codigoReg = 123765//randomExt.integer(999999, 100000);
 var validadorReg= require('../models').validador;
-const varEmail= "123gabrielsoriano39@gmail.com";//req.body.email;
 const funcAux= require('../controllers/funciones');
 
 // email sender function
@@ -20,7 +19,7 @@ exports.sendEmail = function (req, res) {
     // Definimos el email
     var mailOptions = {
         from: 'Recetips',
-        to: varEmail,
+        to: req.body.email,
         subject: 'Alta de usuario',
         text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
     };

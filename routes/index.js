@@ -1,6 +1,5 @@
 /* Controllers */
 const usuarioController = require('../controllers/controllerUsuario');
-const logeoController = require('../controllers/controllerLogeo');
 const tipoController = require('../controllers/controllerTipo');
 const recetaController = require('../controllers/controllerReceta');
 const logeoController = require('../controllers/controllerLogeo');
@@ -18,7 +17,8 @@ module.exports = (app) => {
       message: 'Direccion incorrecta!!',
    }));
 
-   app.get('/usuario/create/logeo', logeoController.logueo)
+   app.get('/usuario/recuperar/logeo', logeoController.logueo);
+   app.post('/usuario/create/crearUsuario', logeoController.crearUsuario)
 
    //receta
    app.get('/receta/list', recetaController.list);
@@ -42,5 +42,7 @@ module.exports = (app) => {
    
    //email router
    app.post('/email', EmailCtrl.sendEmail);
+
+
 
 };
