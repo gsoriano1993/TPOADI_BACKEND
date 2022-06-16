@@ -25,7 +25,7 @@ module.exports = {
                  }
              })
      },*/
-    logueo(req, res) {
+   /* logueo(req, res) {
         var resultados= findAll({
             attributes: ['contrasenia'],
             where: {
@@ -42,7 +42,7 @@ module.exports = {
             }
         })
         )
-    },
+    },*/
     crearUsuario(req, res) {
         return logeo
             .create({

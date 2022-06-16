@@ -17,7 +17,7 @@ module.exports = (app) => {
       message: 'Direccion incorrecta!!',
    }));
 
-   app.get('/usuario/recuperar/logeo', logeoController.logueo);
+   //app.get('/usuario/recuperar/logeo', logeoController.logueo);
    app.post('/usuario/create/crearUsuario', logeoController.crearUsuario)
 
    //receta
