@@ -3,7 +3,7 @@ const usuarioController = require('../controllers/controllerUsuario');
 const tipoController = require('../controllers/controllerTipo');
 const recetaController = require('../controllers/controllerReceta');
 const logeoController = require('../controllers/controllerLogeo');
-const validadorController =require('../controllers/controllerValidador');
+//const validadorController =require('../controllers/controllerValidador');
 
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
