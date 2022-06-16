@@ -14,7 +14,7 @@ exports.sendEmail = function (req, res) {
         port: 587, // port for secure SMTP
         secureConnection: false,
         tls: {
-           ciphers:'SSLv3'
+            ciphers: 'SSLv3'
         },
         auth: {
             user: 'gabrielsoriano.-@hotmail.com',
@@ -31,13 +31,12 @@ exports.sendEmail = function (req, res) {
     // Enviamos el email
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-         console.log(error);
-         res.status(500).send("error en el envio")
+            res.status(500).send("error en el envio")
         } else {
-        res.status(200).send("correo enviado")
+            res.status(200).send("correo enviado")
         }
-         /*   funcAux.cargarCodigo(req.body.mail, codigoReg);
-            codigoReg = randomExt.integer(999999, 100000);
-        }*/
+        /*   funcAux.cargarCodigo(req.body.mail, codigoReg);
+           codigoReg = randomExt.integer(999999, 100000);
+       }*/
     });
 };
