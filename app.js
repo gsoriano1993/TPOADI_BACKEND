@@ -47,7 +47,7 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
 })
 
 //crear usurio
-
+/*
 app.use('/validarCredenciales', async (req, res) => {
      //valido si mail ya existe
      if (req.method === 'GET') {
@@ -74,59 +74,57 @@ app.use('/validarCredenciales', async (req, res) => {
           }
 
      }
+*/
 
 
 
-
-
-
-          //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
-          app.use('/validarCredenciales', async (req, res) => {
-               if (req.method === 'GET') {
-                    const resultados = await logeo.findAll({
-                         attributes: ['contrasenia'],
-                         raw: true,
-                         where: {
-                              mail: req.body.mail
-                              //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
-                         }
-                    });
-
-                    if (resultados.length === 0) {
-                         res.status(200).json({
-                              message: "mail inexistente"
-                         })
-                    } else {
-                         bcrypt.compare(req.body.contrasenia, resultados[0].contrasenia, (error, result) => {
-                              if (error) {
-                                   console.error('Error: ', error);
-                              } else {
-                                   //console.log('Credenciales correctas?: ', result ) // true o false
-                                   if (result === true) {
-                                        res.status(200).json({
-                                             message: "credenciales ok, bienvenido"
-                                        })
-                                   } else {
-                                        res.status(200).json({
-                                             message: "credenciales incorrectas"
-                                        })
-                                   }
-                              }
-                         })
-
+     //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
+     app.use('/validarCredenciales', async (req, res) => {
+          if (req.method === 'GET') {
+               const resultados = await logeo.findAll({
+                    attributes: ['contrasenia'],
+                    raw: true,
+                    where: {
+                         mail: req.body.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
                     }
+               });
+
+               if (resultados.length === 0) {
+                    res.status(200).json({
+                         message: "mail inexistente"
+                    })
+               } else {
+                    bcrypt.compare(req.body.contrasenia, resultados[0].contrasenia, (error, result) => {
+                         if (error) {
+                              console.error('Error: ', error);
+                         } else {
+                              //console.log('Credenciales correctas?: ', result ) // true o false
+                              if (result === true) {
+                                   res.status(200).json({
+                                        message: "credenciales ok, bienvenido"
+                                   })
+                              } else {
+                                   res.status(200).json({
+                                        message: "credenciales incorrectas"
+                                   })
+                              }
+                         }
+                    })
+
                }
-          });
+          }
+     });
 
 
 
 
 
 
-          require('./routes')(app);
-          const port = process.env.PORT || 8000;
-          app.set('port', port);
-          const server = http.createServer(app);
-          server.listen(port);
-          module.exports = app;
+     require('./routes')(app);
+     const port = process.env.PORT || 8000;
+     app.set('port', port);
+     const server = http.createServer(app);
+     server.listen(port);
+     module.exports = app;
 
