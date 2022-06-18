@@ -124,7 +124,7 @@ app.use('/validarCredenciales', async (req, res) => {
      require('./routes')(app);
      const port = process.env.PORT || 8000;
      app.set('port', port);
-     const server = http.createServer(app);
+     const server = https.createServer(app);
      server.listen(port);
      module.exports = app;
 
