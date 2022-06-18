@@ -14,18 +14,11 @@ const logeo = require('./models').logeo;
 const bcrypt = require('bcryptjs');
 
 
-const sslRedirect =require('heroku-ssl-redirect').default;
-
-
-// enable ssl redirect
-app.use(sslRedirect());
-
 // Log requests to the console.
 app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 
 
