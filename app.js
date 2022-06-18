@@ -18,6 +18,8 @@ app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+var cors = require('cors');
+app.use(cors());
 
 //carga de imagenes
 app.use('/upload-images', upload.array('image'), async (req, res) => {
