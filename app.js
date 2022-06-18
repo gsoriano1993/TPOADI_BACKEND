@@ -14,13 +14,6 @@ const logeo = require('./models').logeo;
 const bcrypt = require('bcryptjs');
 
 
-let response;
-let statusCode;
-const fetchOptions = {
-  agent: new http.Agent({ keepAlive: true }),
-  timeout: 5000,
-};
-
 
 
 // Log requests to the console.
@@ -89,8 +82,6 @@ app.use('/validarCredenciales', async (req, res) => {
 
      //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
      app.use('/validarCredenciales', async (req, res) => {
-          response = await fetch(url, fetchOptions).catch(catchError);
-          statusCode = response.status;
           if (req.method === 'GET') {
                const resultados = await logeo.findAll({
                     attributes: ['contrasenia'],
