@@ -14,6 +14,16 @@ const logeo = require('./models').logeo;
 const bcrypt = require('bcryptjs');
 
 
+let response;
+let statusCode;
+const fetchOptions = {
+  agent: new http.Agent({ keepAlive: true }),
+  timeout: 5000,
+};
+response = await fetch(url, fetchOptions).catch(catchError);
+statusCode = response.status;
+
+
 // Log requests to the console.
 app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
@@ -116,15 +126,10 @@ app.use('/validarCredenciales', async (req, res) => {
           }
      });
 
-
-
-
-
-
      require('./routes')(app);
      const port = process.env.PORT || 8000;
      app.set('port', port);
-     const server = https.createServer(app);
+     const server = http.createServer(app);
      server.listen(port);
      module.exports = app;
 
