@@ -13,14 +13,11 @@ const fs = require('fs');
 const logeo = require('./models').logeo;
 const bcrypt = require('bcryptjs');
 
-
 // Log requests to the console.
 app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-
 
 //carga de imagenes
 app.use('/upload-images', upload.array('image'), async (req, res) => {
