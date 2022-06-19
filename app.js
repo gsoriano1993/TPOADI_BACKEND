@@ -159,7 +159,7 @@ app.use('/validarCredenciales', async (req, res) => {
                attributes: ['contrasenia'],
                raw: true,
                where: {
-                    mail: req.body.mail
+                    mail: req.body.data.mail
                     //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
                }
           });
@@ -169,7 +169,7 @@ app.use('/validarCredenciales', async (req, res) => {
                     message: "mail inexistente"
                })
           } else {
-               bcrypt.compare(req.body.contrasenia, resultados[0].contrasenia, (error, result) => {
+               bcrypt.compare(req.body.data.contrasenia, resultados[0].contrasenia, (error, result) => {
                     if (error) {
                          console.error('Error: ', error);
                     } else {
