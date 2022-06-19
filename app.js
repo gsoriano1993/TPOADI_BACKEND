@@ -16,6 +16,7 @@ const validador = require('./models').validador;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models/usuario');
 const mailController = require('./controllers/mailCtrl')
+const {check, validationResult} = require('express-validator');
 
 // Log requests to the console.
 app.use(logger('dev'));
@@ -56,9 +57,19 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
 })
 
 ///******************** REGISTRO *********************///
-app.use('/signup', async (req, res) => {
+app.use('/signup', [
+     check('mail', 'El usuario es obligatorio').not().isEmpty(), // comprueba si el mail esta vacio antes de ir a guardarlo
+     check('mail', 'El email es inválido').isEmail(), // coprueba que tenga formato de email
+     check('nickname', 'El alias es obligatorio').not().isEmpty()
+     ] ,async (req, res) => {
      try {
           if (req.method === 'POST') {
+
+               const errors = validationResult(req); // valido si alguno de los checks fallo
+               if(!errors.isEmpty()){ // si hubieron fallas 
+                    return res.status(422).json({ errors : errors.array()}); // status 422: no se ha podido crear entidad, devuelvo como json un array con todos los errores
+               }
+
                //valido si mail ya existe
                const resultadosMail = await usuario.findAll({
                     attributes: ['mail','habilitado'],
@@ -207,9 +218,10 @@ app.use('/password', async (req, res) => { // Utilizado cuando el usuario crea s
                          message: "Mail inexistente"
                     })
                } else {
+                    let password = bcrypt.hashSync(req.body.data.contrasenia, 10); // Encripta la contraseña: 10 es el numero de veces que se aplica el algoritmo de encriptacion
                     logeo.create({
                          mail: req.body.data.mail,
-                         contrasenia: req.params.data.contrasenia
+                         contrasenia: password
                     })
                     res.status(200).json({
                          message: "usuario creado ocn éxito"
