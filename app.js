@@ -58,9 +58,9 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
 
 ///******************** REGISTRO *********************///
 app.use('/signup', [
-     check('mail', 'El usuario es obligatorio').not().isEmpty(), // comprueba si el mail esta vacio antes de ir a guardarlo
-     check('mail', 'El email es inválido').isEmail(), // coprueba que tenga formato de email
-     check('nickname', 'El alias es obligatorio').not().isEmpty()
+     check('data.mail', 'El email es obligatorio').not().isEmpty(), // comprueba si el mail esta vacio antes de ir a guardarlo
+     check('data.mail', 'El email es inválido').isEmail(), // coprueba que tenga formato de email
+     check('data.nickname', 'El alias es obligatorio').not().isEmpty()
      ] ,async (req, res) => {
      try {
           if (req.method === 'POST') {
