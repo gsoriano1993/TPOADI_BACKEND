@@ -175,13 +175,13 @@ app.use('/validadorSignUp', async (req, res) => {
 //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
 app.use('/validarCredenciales', async (req, res) => {
      try {
-          console.log(req.body.data.data.mail)
+          console.log(req.body.data.mail)
           if (req.method === 'POST') {
                const resultados = await logeo.findAll({
                     attributes: ['contrasenia'],
                     raw: true,
                     where: {
-                         mail: req.body.data.data.mail
+                         mail: req.body.data.mail
                          //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
                     }
                });
