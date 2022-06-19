@@ -27,142 +27,162 @@ app.use(cors({origin:'*'}));
 
 ///******************** CARGA DE IMAGENES *********************///
 app.use('/upload-images', upload.array('image'), async (req, res) => {
-     const uploader = async (path) => cloudinary.uploads(path, 'Images');
-     if (req.method === 'POST') {
-          const urls = []
-          const files = req.files;
-          for (const file of files) {
-               const { path } = file;
-               const newPath = await uploader(path)
-               urls.push(newPath)
-               fs.unlinkSync(path)
+     try {
+          const uploader = async (path) => cloudinary.uploads(path, 'Images');
+          if (req.method === 'POST') {
+               const urls = []
+               const files = req.files;
+               for (const file of files) {
+                    const { path } = file;
+                    const newPath = await uploader(path)
+                    urls.push(newPath)
+                    fs.unlinkSync(path)
+               }
+               res.status(200).json({
+                    message: 'images uploaded succesfully',
+                    data: urls
+               })
+          } else {
+               res.status(405).json({
+                    err: `${req.method} method not allowed`
+               })
           }
-          res.status(200).json({
-               message: 'images uploaded succesfully',
-               data: urls
-          })
-     } else {
-          res.status(405).json({
-               err: `${req.method} method not allowed`
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
           })
      }
 })
 
 ///******************** REGISTRO *********************///
 app.use('/signup', async (req, res) => {
-     if (req.method === 'GET') {
-          //valido si mail ya existe
-          const resultadosMail = await logeo.findAll({
-               attributes: ['mail'],
-               raw: true,
-               where: {
-                    mail: req.body.mail
-                    //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
-               }
-          });
-          if (resultadosMail.length === 0) {
-               logeo.create({
-                    mail: req.body.mail,
-                    contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
-               })
-               res.status(200).json({
-                    message: "usuario creado correctamente"
-               })
-          } else {
-               res.status(200).json({
-                    message: "mail en uso"
-               })
-          }
-          /////////valido si existe alias/nickname
-          const resultadosAlias = await usuario.findAll({
-               attributes: ['nickname'],
-               raw: true,
-               where: {
-                    mail: req.body.nickname
-               }
-          });
-          if (resultadosAlias.length === 0) {
-               usuario.create({
-                    mail: req.body.mail,
-                    nickname: req.body.nickname,
-                    habilitado: -1,
-                    nombre: null,
-                    avatar: null,
-                    tipo_usuario: "INVITADO"
-               })
-               res.status(200).json({
-                    message: "usuario creado correctamente"
-               })
-          } else {
-               res.status(200).json({
-                    message: "error en la carga de datos en la BD"
-               })
-          }
-          /////////////// GENERA CODIGO Y ENVIA AL USUARIO
-          var codigoReg = randomExt.integer(999999, 100000);
-          var mailOptions = {
-               from: 'Recetips',
-               to: req.body.mail,
-               subject: 'Alta de usuario',
-               text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
-          };
-          //envio el mail y cargo el codigo en la tabla
-          transporter.sendMail(mailOptions, function (error, info) {
-               if (error) {
-                    res.status(500).send("error en el envio")
-               } else {
-                    res.status(200).send("correo enviado")
-                    validador.create({
-                         mail: req.body.mail,
-                         codigo: codigoReg
+     try {
+          if (req.method === 'GET') {
+               //valido si mail ya existe
+               const resultadosMail = await logeo.findAll({
+                    attributes: ['mail'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
+                    }
+               });
+               if (resultadosMail.length === 0) {
+                    logeo.create({
+                         mail: req.body.data.mail,
+                         contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
                     })
                     res.status(200).json({
                          message: "usuario creado correctamente"
                     })
+               } else {
+                    res.status(200).json({
+                         message: "mail en uso"
+                    })
                }
-          });
-
+               /////////valido si existe alias/nickname
+               const resultadosAlias = await usuario.findAll({
+                    attributes: ['nickname'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.nickname
+                    }
+               });
+               if (resultadosAlias.length === 0) {
+                    usuario.create({
+                         mail: req.body.data.mail,
+                         nickname: req.body.data.nickname,
+                         habilitado: -1,
+                         nombre: null,
+                         avatar: null,
+                         tipo_usuario: "INVITADO"
+                    })
+                    res.status(200).json({
+                         message: "usuario creado correctamente"
+                    })
+               } else {
+                    res.status(200).json({
+                         message: "error en la carga de datos en la BD"
+                    })
+               }
+               /////////////// GENERA CODIGO Y ENVIA AL USUARIO
+               var codigoReg = randomExt.integer(999999, 100000);
+               var mailOptions = {
+                    from: 'Recetips',
+                    to: req.body.data.mail,
+                    subject: 'Alta de usuario',
+                    text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+               };
+               //envio el mail y cargo el codigo en la tabla
+               transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                         res.status(500).send("error en el envio")
+                    } else {
+                         res.status(200).send("correo enviado")
+                         validador.create({
+                              mail: req.body.data.mail,
+                              codigo: codigoReg
+                         })
+                         res.status(200).json({
+                              message: "usuario creado correctamente"
+                         })
+                    }
+               });
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
      }
 })
+
 //valido si el codigo ingresado por el usuario es el mismo que el enviado en el mail
 app.use('/validadorSignUp', async (req, res) => {
-validador.findAll()
-if (req.method === 'GET') {
-     //valido si mail ya existe
-     const resultadosCodigo = await logeo.findAll({
-          attributes: ['codigo'],
-          raw: true,
-          where: {
-               mail: req.body.mail
+     try {
+          validador.findAll()
+          if (req.method === 'GET') {
+               //valido si mail ya existe
+               const resultadosCodigo = await logeo.findAll({
+                    attributes: ['codigo'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.mail
+                    }
+               })
+               if (resultadosCodigo === req.body.data.codigo) {
+                    res.status(200).json({
+                         message: "Codigo OK usuario autenticado correctamente"
+                    })
+               } else {
+                    res.status(200).json({
+                         message: "Codigo erroneo"
+                    })
+               }
+     
           }
-     })
-     if (resultadosCodigo === req.body.codigo) {
-          res.status(200).json({
-               message: "Codigo OK usuario autenticado correctamente"
-          })
-     } else {
-          res.status(200).json({
-               message: "Codigo erroneo"
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
           })
      }
-
-}
 });
 
 
 ///******************** LOGEO *********************///
 //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
 app.use('/validarCredenciales', async (req, res) => {
-
      try {
-          console.log(req.body.data.mail)
+          console.log(req.body.data.data.mail)
           if (req.method === 'POST') {
                const resultados = await logeo.findAll({
                     attributes: ['contrasenia'],
                     raw: true,
                     where: {
-                         mail: req.body.data.mail
-                         //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
+                         mail: req.body.data.data.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
                     }
                });
 
@@ -187,14 +207,14 @@ app.use('/validarCredenciales', async (req, res) => {
                               }
                          }
                     })
-
                }
           }
      } catch (error) {
-          console.log("Catch", error)
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
      }
-
-
 });
 
 require('./routes')(app);
