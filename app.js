@@ -3,6 +3,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 // This will be our application entry. We'll setup our server here.
 const http = require('http');
+const cors = require('cors');
 const { sequelize } = require('./models');
 const Sequelize = require('sequelize');
 // Set up the express app
@@ -15,12 +16,14 @@ const validador = require('./models').validador;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models/usuario');
 const mailController = require('./controllers/mailCtrl')
+
 // Log requests to the console.
 app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(cors({origin:'*'}));
 
 ///******************** CARGA DE IMAGENES *********************///
 app.use('/upload-images', upload.array('image'), async (req, res) => {
