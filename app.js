@@ -60,7 +60,7 @@ app.use('/signup', async (req, res) => {
      try {
           if (req.method === 'POST') {
                //valido si mail ya existe
-               const resultadosMail = await logeo.findAll({
+               const resultadosMail = await usuario.findAll({
                     attributes: ['mail','habilitado'],
                     raw: true,
                     where: {
@@ -145,7 +145,7 @@ app.use('/signup', async (req, res) => {
                               codigo: codigoReg
                          })
                          res.status(200).json({
-                              message: "usuario creado correctamente"
+                              message: "código creado correctamente"
                          })
                     }
                });
@@ -180,6 +180,41 @@ app.use('/validadorSignUp', async (req, res) => {
                     })
                }
      
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+/* Crear contraseña */
+app.use('/password', async (req, res) => { // Utilizado cuando el usuario crea su contraseña (sea por primera vez o por recuperacion)
+     try {
+          if (req.method === 'POST') {
+               //valido si mail ya existe
+               const resultadosMail = await usuario.findAll({
+                    attributes: ['mail'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
+                    }
+               });
+               if (resultadosMail.length === 0) {
+                    res.status(200).json({
+                         message: "Mail inexistente"
+                    })
+               } else {
+                    logeo.create({
+                         mail: req.body.data.mail,
+                         contrasenia: req.params.data.contrasenia
+                    })
+                    res.status(200).json({
+                         message: "usuario creado ocn éxito"
+                    })
+               }
           }
      } catch (error) {
           console.log("Catch error", error)
@@ -236,7 +271,7 @@ app.use('/validarCredenciales', async (req, res) => {
      }
 });
 
-app.use('/recover', async (req, res) => { // Utilizado cuando olvide mi contraseña
+app.use('/recover', async (req, res) => { // Utilizado cuando el usuario olvida su contraseña, e ingresa su email para recuperarla
      try {
           if (req.method === 'POST') {
                //valido si mail ya existe
