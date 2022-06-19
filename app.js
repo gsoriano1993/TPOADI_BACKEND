@@ -122,6 +122,7 @@ app.use('/signup', async (req, res) => {
      }
 })
 //valido si el codigo ingresado por el usuario es el mismo que el enviado en el mail
+app.use('/validadorSignUp', async (req, res) => {
 validador.findAll()
 if (req.method === 'GET') {
      //valido si mail ya existe
@@ -143,7 +144,7 @@ if (req.method === 'GET') {
      }
 
 }
-
+});
 
 
 ///******************** LOGEO *********************///
