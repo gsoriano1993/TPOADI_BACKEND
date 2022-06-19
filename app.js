@@ -153,41 +153,48 @@ if (req.method === 'GET') {
 ///******************** LOGEO *********************///
 //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
 app.use('/validarCredenciales', async (req, res) => {
-     console.log(req.body.data.mail)
-     if (req.method === 'GET') {
-          const resultados = await logeo.findAll({
-               attributes: ['contrasenia'],
-               raw: true,
-               where: {
-                    mail: req.body.data.mail
-                    //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
-               }
-          });
 
-          if (resultados.length === 0) {
-               res.status(200).json({
-                    message: "mail inexistente"
-               })
-          } else {
-               bcrypt.compare(req.body.data.contrasenia, resultados[0].contrasenia, (error, result) => {
-                    if (error) {
-                         console.error('Error: ', error);
-                    } else {
-                         //console.log('Credenciales correctas?: ', result ) // true o false
-                         if (result === true) {
-                              res.status(200).json({
-                                   message: "credenciales ok, bienvenido"
-                              })
-                         } else {
-                              res.status(200).json({
-                                   message: "credenciales incorrectas"
-                              })
-                         }
+     try {
+          console.log(req.body.data.mail)
+          if (req.method === 'POST') {
+               const resultados = await logeo.findAll({
+                    attributes: ['contrasenia'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.contrasenia, 10)
                     }
-               })
+               });
 
+               if (resultados.length === 0) {
+                    res.status(200).json({
+                         message: "mail inexistente"
+                    })
+               } else {
+                    bcrypt.compare(req.body.data.contrasenia, resultados[0].contrasenia, (error, result) => {
+                         if (error) {
+                              console.error('Error: ', error);
+                         } else {
+                              //console.log('Credenciales correctas?: ', result ) // true o false
+                              if (result === true) {
+                                   res.status(200).json({
+                                        message: "credenciales ok, bienvenido"
+                                   })
+                              } else {
+                                   res.status(200).json({
+                                        message: "credenciales incorrectas"
+                                   })
+                              }
+                         }
+                    })
+
+               }
           }
+     } catch (error) {
+          console.log("Catch", error)
      }
+
+
 });
 
 require('./routes')(app);
