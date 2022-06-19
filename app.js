@@ -153,7 +153,7 @@ if (req.method === 'GET') {
 ///******************** LOGEO *********************///
 //ver como el front maneja la casuistica del logeo (cambiar codigo 200 del status?)
 app.use('/validarCredenciales', async (req, res) => {
-     console.log(req.body.mail)
+     console.log(req.body.data.mail)
      if (req.method === 'GET') {
           const resultados = await logeo.findAll({
                attributes: ['contrasenia'],
