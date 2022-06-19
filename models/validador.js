@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   validador.init({
     idValidador: DataTypes.INTEGER,
-    idUsuario: DataTypes.STRING,
+    mail: DataTypes.STRING,
     codigo: DataTypes.INTEGER
   }, {
     sequelize,
