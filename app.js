@@ -58,10 +58,10 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
 ///******************** REGISTRO *********************///
 app.use('/signup', async (req, res) => {
      try {
-          if (req.method === 'GET') {
+          if (req.method === 'POST') {
                //valido si mail ya existe
                const resultadosMail = await logeo.findAll({
-                    attributes: ['mail'],
+                    attributes: ['mail','habilitado'],
                     raw: true,
                     where: {
                          mail: req.body.data.mail
@@ -77,9 +77,29 @@ app.use('/signup', async (req, res) => {
                          message: "usuario creado correctamente"
                     })
                } else {
+                    console.log(resultadosMail)
+                    try{
+                         console.log(resultadosMail[0])
+                    }
+                    catch(err){
+                         console.log("not an array");
+                    }
                     res.status(200).json({
                          message: "mail en uso"
                     })
+
+                    // Validar si registro del mail en uso fue completado con éxito!
+                    /*if(resultadosMail[0].habilitado === 1){
+                         res.status(200).json({
+                              message: "mail en uso"
+                         })
+                    }
+                    else{
+                         res.status(200).json({
+                              message: "registro incompleto"
+                         })
+                    }*/
+                    
                }
                /////////valido si existe alias/nickname
                const resultadosAlias = await usuario.findAll({
@@ -103,7 +123,7 @@ app.use('/signup', async (req, res) => {
                     })
                } else {
                     res.status(200).json({
-                         message: "error en la carga de datos en la BD"
+                         message: "alias en uso"
                     })
                }
                /////////////// GENERA CODIGO Y ENVIA AL USUARIO
@@ -141,10 +161,9 @@ app.use('/signup', async (req, res) => {
 //valido si el codigo ingresado por el usuario es el mismo que el enviado en el mail
 app.use('/validadorSignUp', async (req, res) => {
      try {
-          validador.findAll()
-          if (req.method === 'GET') {
+          if (req.method === 'POST') {
                //valido si mail ya existe
-               const resultadosCodigo = await logeo.findAll({
+               const resultadosCodigo = await validador.findAll({
                     attributes: ['codigo'],
                     raw: true,
                     where: {
@@ -216,6 +235,57 @@ app.use('/validarCredenciales', async (req, res) => {
           })
      }
 });
+
+app.use('/recover', async (req, res) => { // Utilizado cuando olvide mi contraseña
+     try {
+          if (req.method === 'POST') {
+               //valido si mail ya existe
+               const resultadosMail = await logeo.findAll({
+                    attributes: ['mail'],
+                    raw: true,
+                    where: {
+                         mail: req.body.data.mail
+                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
+                    }
+               });
+               if (resultadosMail.length === 0) {
+                    res.status(200).json({
+                         message: "Mail inexistente"
+                    })
+               } else {
+                    /////////////// GENERA CODIGO Y ENVIA AL USUARIO
+                    var codigoReg = randomExt.integer(999999, 100000);
+                    var mailOptions = {
+                         from: 'Recetips',
+                         to: req.body.data.mail,
+                         subject: 'Recupero de contraseña',
+                         text: 'Hola! El código que debés ingresar para recuperar tu clave es ' + codigoReg
+                    };
+                    //envio el mail y cargo el codigo en la tabla
+                    transporter.sendMail(mailOptions, function (error, info) {
+                         if (error) {
+                              res.status(500).send("error en el envio")
+                         } else {
+                              res.status(200).send("correo enviado")
+                              validador.create({
+                                   mail: req.body.data.mail,
+                                   codigo: codigoReg
+                              })
+                              res.status(200).json({
+                                   message: "Código de recuperación creado correctamente"
+                              })
+                         }
+                    });
+               }
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
 
 require('./routes')(app);
 const port = process.env.PORT || 8000;
