@@ -21,14 +21,16 @@ module.exports = (sequelize, DataTypes) => {
     nombre: DataTypes.STRING,
     avatar: DataTypes.STRING,
     tipo_usuario: DataTypes.STRING
-  }, {
+  },{
     sequelize,
     modelName: 'usuario',
     tableName:'usuarios'
-  }, {
+  },{
     freezeTableName: true
 });
+/*usuario.hasMany(recetaModel);
+recetaModel.belongsTo(usuario); */
 usuario.removeAttribute('id');
-  return usuario;
+return usuario;
 };
 

@@ -13,10 +13,28 @@ const cloudinary = require('./cloudinary')
 const fs = require('fs');
 const logeo = require('./models').logeo;
 const validador = require('./models').validador;
+const recetaModel = require('./models').receta;
 const bcrypt = require('bcryptjs');
-const usuario = require('./models/usuario');
+const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
 const { check, validationResult } = require('express-validator');
+
+
+
+/////ENDPOINTS
+/*
+login:
+
+
+olvide contraseña:
+1) me manda alias o correo y envio un mail con codigo
+
+registro:
+1) correo y alias
+2)  envio mail con codigo
+3) validacion del codigo
+
+*/
 
 // Log requests to the console.
 app.use(logger('dev'));
@@ -71,106 +89,93 @@ app.use('/signup', [
                }
 
                //valido si mail ya existe
-               const resultadosMail = await usuario.findAll({
-                    attributes: ['mail', 'habilitado'],
+               const resultadosMail =  await usuario.findAll({
+                    attributes: ['mail'],
                     raw: true,
                     where: {
                          mail: req.body.data.mail
-                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
                     }
                });
-               if (resultadosMail.length === 0) {
-                    await logeo.create({
-                         mail: req.body.data.mail,
-                         contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
-                    })
-                    res.status(200).json({
-                         message: "usuario creado correctamente"
-                    })
-               } else {
-                    console.log(resultadosMail)
-                    try {
-                         console.log(resultadosMail[0])
-                    }
-                    catch (err) {
-                         console.log("not an array");
-                    }
-                    // Validar si registro del mail en uso fue completado con éxito!
-                    if (resultadosMail[0].habilitado === 1) {
-                         res.status(200).json({
-                              message: "mail en uso"
-                         })
-                    }
-                    else {
-                         res.status(200).json({
-                              message: "registro incompleto"
-                         })
-                    }
-
-               }
-               /////////valido si existe alias/nickname
-               const resultadosAlias = await usuario.findAll({
+               //valido si nickname ya existe
+               const resultadosAlias =  await usuario.findAll({
                     attributes: ['nickname'],
                     raw: true,
                     where: {
-                         mail: req.body.data.nickname
+                         nickname: req.body.data.nickname
                     }
                });
-               if (resultadosAlias.length === 0) {
-                    await usuario.create({
+               console.log(resultadosMail.length);
+               console.log(resultadosAlias.length);
+               if (!(resultadosMail.length === 0)) {
+                    res.status(200).json({
+                         message: "mail ya usado"
+                    })
+               };
+               if (!(resultadosAlias.length === 0)) {
+                    res.status(200).json({
+                         message: "nickname ya usado"
+                    })
+               }
+               console.log(req.body.data.mail);
+               if (resultadosMail.length == 0 && resultadosAlias.length == 0) {
+                     usuario.create({
                          mail: req.body.data.mail,
                          nickname: req.body.data.nickname,
                          habilitado: -1,
                          nombre: null,
-                         avatar: null,
+                         avatar: 'avatar1',
                          tipo_usuario: "INVITADO"
                     })
-                    /*
-                    Comento esto porque sino el endpoint manda la response acá, y no en la parte de enviar el código por mail 
-                    (aunquela ejecuta igual, no sería correcto devolver ok antes de tiempo)
                     res.status(200).json({
-                         message: "usuario creado correctamente"
-                    })
-                    */
-               } else {
-                    res.status(200).json({
-                         message: "alias en uso"
+                         message: "Mail y alias registrados correctamente"
                     })
                }
-               /////////////// GENERA CODIGO Y ENVIA AL USUARIO
-               var codigoReg = randomExt.integer(999999, 100000);
-               var mailOptions = {
-                    from: 'Recetips',
-                    to: req.body.data.mail,
-                    subject: 'Alta de usuario',
-                    text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
-               };
-               //envio el mail y cargo el codigo en la tabla
-               transporter.sendMail(mailOptions, function (error, info) {
-                    if (error) {
-                         res.status(500).send("error en el envio")
-                    } else {
-                         //res.status(200).send("correo enviado")
-                          validador.create({
-                              mail: req.body.data.mail,
-                              codigo: codigoReg
-                         })
-                         res.status(200).json({
-                              message: "código creado correctamente"
-                         })
-                    }
-               });
           }
-     } catch (error) {
+     }
+     catch (err) {
+          console.log("not an array");
+     }
+});
+
+
+///envio codigo para avanzar con registro
+app.use('/enviarCodigo', async (req, res) => {
+     try {
+          /////////////// GENERA CODIGO Y ENVIA AL USUARIO
+          var codigoReg = randomExt.integer(999999, 100000);
+          var mailOptions = {
+               from: 'Recetips',
+               to: req.body.data.mail,
+               subject: 'Alta de usuario',
+               text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+          };
+
+          transporter.sendMail(mailOptions, function (error, info) {
+               if (error) {
+                    res.status(500).send("error en el envio")
+               } else {
+                    //res.status(200).send("correo enviado")
+                    validador.create({
+                         mail: req.body.data.mail,
+                         codigo: codigoReg
+                    })
+                    res.status(200).json({
+                         message: "código creado correctamente"
+                    })
+               }
+          });
+     }
+     catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
      }
-})
 
-//valido si el codigo ingresado por el usuario es el mismo que el enviado en el mail
-app.use('/validadorSignUp', async (req, res) => {
+});
+
+//valido si el codigo ingresado por el usuario esta ok
+app.use('/validadorCodigo', async (req, res) => {
      try {
           if (req.method === 'POST') {
                //valido si mail ya existe
@@ -183,12 +188,9 @@ app.use('/validadorSignUp', async (req, res) => {
                })
                if (resultadosCodigo === req.body.data.codigo) {
                     //Borrar código?
-                    /*
                     await validador.destroy({
-                         where:{mail:req.body.data.mail}
+                         where: { mail: req.body.data.mail }
                     });
-                    */
-
                     //hago el update a la tabla de usuario cuando el usuario ya quedo validado
                     const updatedRows = await usuario.update(
                          {
@@ -217,39 +219,17 @@ app.use('/validadorSignUp', async (req, res) => {
      }
 });
 
-/* Crear contraseña */
-app.use('/password', async (req, res) => { // Utilizado cuando el usuario crea su contraseña (sea por primera vez o por recuperacion)
+//guardar contraseña
+app.use('/password', async (req, res) => {
      try {
           if (req.method === 'POST') {
-               //valido si mail ya existe
-               const resultadosMail = await usuario.findAll({
-                    attributes: ['mail'],
-                    raw: true,
-                    where: {
-                         mail: req.body.data.mail
-                         //,contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
-                    }
-               });
-               if (resultadosMail.length === 0) {
-                    res.status(200).json({
-                         message: "Mail inexistente"
-                    })
-               } else {
-                    let password = bcrypt.hashSync(req.body.data.contrasenia, 10); // Encripta la contraseña: 10 es el numero de veces que se aplica el algoritmo de encriptacion
-                    await logeo.create({
-                         mail: req.body.data.mail,
-                         contrasenia: password
-                    })
-                    //Actualizar usuario como habilitado?
-                    /*
-                    await usuario.update({...resultadosMail[0],habilitado: 'Si'},{
-                         where:{idUsuario:resultadosMail[0].idUsuario}
-                    })
-                    */
-                    res.status(200).json({
-                         message: "usuario creado con éxito"
-                    })
-               }
+               await logeo.create({
+                    mail: req.body.data.mail,
+                    contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
+               })
+               res.status(200).json({
+                    message: "usuario creado correctamente"
+               })
           }
      } catch (error) {
           console.log("Catch error", error)
@@ -340,7 +320,7 @@ app.use('/recover', [
                               res.status(500).send("error en el envio")
                          } else {
                               //res.status(200).send("correo enviado")
-                               validador.create({
+                              validador.create({
                                    mail: req.body.data.mail,
                                    codigo: codigoReg
                               })
@@ -359,6 +339,32 @@ app.use('/recover', [
      }
 });
 
+///******************** RECETAS *********************///
+//** BUSCAR RECETAS DEL USUARIO */
+app.use('/receta/:idReceta', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const resultadosRecetas = await usuario.findAll({
+                    include: recetaModel,
+                    attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
+                    raw: true,
+                    where: {
+                         idUsuario: req.body.data.idUsuario
+                    }
+               });
+          }
+          if (resultadosRecetas.length === 0) {
+               res.status(200).json({
+                    message: "No existe esa receta"
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
 
 require('./routes')(app);
 const port = process.env.PORT || 8000;
