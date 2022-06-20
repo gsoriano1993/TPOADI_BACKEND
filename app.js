@@ -191,6 +191,16 @@ app.use('/validadorSignUp', async (req, res) => {
                     res.status(200).json({
                          message: "Codigo OK usuario autenticado correctamente"
                     })
+                    //hago el update a la tabla de usuario cuando el usuario ya quedo validado
+                    const updatedRows = await usuario.update(
+                         {
+                           habilitado: 1,
+                         },
+                         {
+                           where: { mail: req.body.data.mail },
+                         }
+                       );
+                       console.log(updatedRows);
                } else {
                     res.status(200).json({
                          message: "Codigo erroneo"
