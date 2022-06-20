@@ -59,7 +59,7 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
 ///******************** REGISTRO *********************///
 app.use('/signup', [
      check('data.mail', 'El email es obligatorio').not().isEmpty(), // comprueba si el mail esta vacio antes de ir a guardarlo
-     check('data.mail', 'El email es inválido').isEmail(), // coprueba que tenga formato de email
+     check('data.mail', 'El email es inválido').isEmail(), // comprueba que tenga formato de email
      check('data.nickname', 'El alias es obligatorio').not().isEmpty()
      ] ,async (req, res) => {
      try {
@@ -80,7 +80,7 @@ app.use('/signup', [
                     }
                });
                if (resultadosMail.length === 0) {
-                    logeo.create({
+                    await logeo.create({
                          mail: req.body.data.mail,
                          contrasenia: bcrypt.hashSync(req.body.data.contrasenia, 10)
                     })
@@ -95,12 +95,8 @@ app.use('/signup', [
                     catch(err){
                          console.log("not an array");
                     }
-                    res.status(200).json({
-                         message: "mail en uso"
-                    })
-
                     // Validar si registro del mail en uso fue completado con éxito!
-                    /*if(resultadosMail[0].habilitado === 1){
+                    if(resultadosMail[0].habilitado === 1){
                          res.status(200).json({
                               message: "mail en uso"
                          })
@@ -109,7 +105,7 @@ app.use('/signup', [
                          res.status(200).json({
                               message: "registro incompleto"
                          })
-                    }*/
+                    }
                     
                }
                /////////valido si existe alias/nickname
@@ -121,7 +117,7 @@ app.use('/signup', [
                     }
                });
                if (resultadosAlias.length === 0) {
-                    usuario.create({
+                    await usuario.create({
                          mail: req.body.data.mail,
                          nickname: req.body.data.nickname,
                          habilitado: -1,
@@ -129,9 +125,13 @@ app.use('/signup', [
                          avatar: null,
                          tipo_usuario: "INVITADO"
                     })
+                    /*
+                    Comento esto porque sino el endpoint manda la response acá, y no en la parte de enviar el código por mail 
+                    (aunquela ejecuta igual, no sería correcto devolver ok antes de tiempo)
                     res.status(200).json({
                          message: "usuario creado correctamente"
                     })
+                    */
                } else {
                     res.status(200).json({
                          message: "alias en uso"
@@ -150,8 +150,8 @@ app.use('/signup', [
                     if (error) {
                          res.status(500).send("error en el envio")
                     } else {
-                         res.status(200).send("correo enviado")
-                         validador.create({
+                         //res.status(200).send("correo enviado")
+                         await validador.create({
                               mail: req.body.data.mail,
                               codigo: codigoReg
                          })
@@ -219,12 +219,12 @@ app.use('/password', async (req, res) => { // Utilizado cuando el usuario crea s
                     })
                } else {
                     let password = bcrypt.hashSync(req.body.data.contrasenia, 10); // Encripta la contraseña: 10 es el numero de veces que se aplica el algoritmo de encriptacion
-                    logeo.create({
+                    await logeo.create({
                          mail: req.body.data.mail,
                          contrasenia: password
                     })
                     res.status(200).json({
-                         message: "usuario creado ocn éxito"
+                         message: "usuario creado con éxito"
                     })
                }
           }
@@ -265,6 +265,7 @@ app.use('/validarCredenciales', async (req, res) => {
                               if (result === true) {
                                    res.status(200).json({
                                         message: "credenciales ok, bienvenido"
+                                        //user : resultados[0]
                                    })
                               } else {
                                    res.status(200).json({
@@ -283,7 +284,9 @@ app.use('/validarCredenciales', async (req, res) => {
      }
 });
 
-app.use('/recover', async (req, res) => { // Utilizado cuando el usuario olvida su contraseña, e ingresa su email para recuperarla
+app.use('/recover', [
+     check('data.mail', 'El email es inválido').isEmail(), // comprueba que tenga formato de email
+],async (req, res) => { // Utilizado cuando el usuario olvida su contraseña, e ingresa su email para recuperarla
      try {
           if (req.method === 'POST') {
                //valido si mail ya existe
@@ -313,8 +316,8 @@ app.use('/recover', async (req, res) => { // Utilizado cuando el usuario olvida 
                          if (error) {
                               res.status(500).send("error en el envio")
                          } else {
-                              res.status(200).send("correo enviado")
-                              validador.create({
+                              //res.status(200).send("correo enviado")
+                              await validador.create({
                                    mail: req.body.data.mail,
                                    codigo: codigoReg
                               })
