@@ -182,6 +182,12 @@ app.use('/validadorSignUp', async (req, res) => {
                     }
                })
                if (resultadosCodigo === req.body.data.codigo) {
+                    //Borrar código?
+                    /*
+                    await validador.destroy({
+                         where:{mail:req.body.data.mail}
+                    });
+                    */
                     res.status(200).json({
                          message: "Codigo OK usuario autenticado correctamente"
                     })
@@ -223,6 +229,12 @@ app.use('/password', async (req, res) => { // Utilizado cuando el usuario crea s
                          mail: req.body.data.mail,
                          contrasenia: password
                     })
+                    //Actualizar usuario como habilitado?
+                    /*
+                    await usuario.update({...resultadosMail[0],habilitado: 'Si'},{
+                         where:{idUsuario:resultadosMail[0].idUsuario}
+                    })
+                    */
                     res.status(200).json({
                          message: "usuario creado con éxito"
                     })
