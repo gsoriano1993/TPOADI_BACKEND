@@ -16,7 +16,7 @@ const validador = require('./models').validador;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models/usuario');
 const mailController = require('./controllers/mailCtrl')
-const {check, validationResult} = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 // Log requests to the console.
 app.use(logger('dev'));
@@ -24,7 +24,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(cors({origin:'*'}));
+app.use(cors({ origin: '*' }));
 
 ///******************** CARGA DE IMAGENES *********************///
 app.use('/upload-images', upload.array('image'), async (req, res) => {
@@ -61,18 +61,18 @@ app.use('/signup', [
      check('data.mail', 'El email es obligatorio').not().isEmpty(), // comprueba si el mail esta vacio antes de ir a guardarlo
      check('data.mail', 'El email es inválido').isEmail(), // comprueba que tenga formato de email
      check('data.nickname', 'El alias es obligatorio').not().isEmpty()
-     ] ,async (req, res) => {
+], async (req, res) => {
      try {
           if (req.method === 'POST') {
 
                const errors = validationResult(req); // valido si alguno de los checks fallo
-               if(!errors.isEmpty()){ // si hubieron fallas 
-                    return res.status(422).json({ errors : errors.array()}); // status 422: no se ha podido crear entidad, devuelvo como json un array con todos los errores
+               if (!errors.isEmpty()) { // si hubieron fallas 
+                    return res.status(422).json({ errors: errors.array() }); // status 422: no se ha podido crear entidad, devuelvo como json un array con todos los errores
                }
 
                //valido si mail ya existe
                const resultadosMail = await usuario.findAll({
-                    attributes: ['mail','habilitado'],
+                    attributes: ['mail', 'habilitado'],
                     raw: true,
                     where: {
                          mail: req.body.data.mail
@@ -89,24 +89,24 @@ app.use('/signup', [
                     })
                } else {
                     console.log(resultadosMail)
-                    try{
+                    try {
                          console.log(resultadosMail[0])
                     }
-                    catch(err){
+                    catch (err) {
                          console.log("not an array");
                     }
                     // Validar si registro del mail en uso fue completado con éxito!
-                    if(resultadosMail[0].habilitado === 1){
+                    if (resultadosMail[0].habilitado === 1) {
                          res.status(200).json({
                               message: "mail en uso"
                          })
                     }
-                    else{
+                    else {
                          res.status(200).json({
                               message: "registro incompleto"
                          })
                     }
-                    
+
                }
                /////////valido si existe alias/nickname
                const resultadosAlias = await usuario.findAll({
@@ -151,7 +151,7 @@ app.use('/signup', [
                          res.status(500).send("error en el envio")
                     } else {
                          //res.status(200).send("correo enviado")
-                         await validador.create({
+                          validador.create({
                               mail: req.body.data.mail,
                               codigo: codigoReg
                          })
@@ -188,25 +188,26 @@ app.use('/validadorSignUp', async (req, res) => {
                          where:{mail:req.body.data.mail}
                     });
                     */
-                    res.status(200).json({
-                         message: "Codigo OK usuario autenticado correctamente"
-                    })
+
                     //hago el update a la tabla de usuario cuando el usuario ya quedo validado
                     const updatedRows = await usuario.update(
                          {
-                           habilitado: 1,
+                              habilitado: 1,
                          },
                          {
-                           where: { mail: req.body.data.mail },
+                              where: { mail: req.body.data.mail },
                          }
-                       );
-                       console.log(updatedRows);
+                    );
+                    console.log(updatedRows);
+                    res.status(200).json({
+                         message: "Codigo OK usuario autenticado correctamente"
+                    })
                } else {
                     res.status(200).json({
                          message: "Codigo erroneo"
                     })
                }
-     
+
           }
      } catch (error) {
           console.log("Catch error", error)
@@ -308,7 +309,7 @@ app.use('/validarCredenciales', async (req, res) => {
 
 app.use('/recover', [
      check('data.mail', 'El email es inválido').isEmail(), // comprueba que tenga formato de email
-],async (req, res) => { // Utilizado cuando el usuario olvida su contraseña, e ingresa su email para recuperarla
+], async (req, res) => { // Utilizado cuando el usuario olvida su contraseña, e ingresa su email para recuperarla
      try {
           if (req.method === 'POST') {
                //valido si mail ya existe
@@ -339,7 +340,7 @@ app.use('/recover', [
                               res.status(500).send("error en el envio")
                          } else {
                               //res.status(200).send("correo enviado")
-                              await validador.create({
+                               validador.create({
                                    mail: req.body.data.mail,
                                    codigo: codigoReg
                               })
