@@ -149,9 +149,11 @@ app.use('/signup', [
                console.log(mailOptions);
                transporter.sendMail(mailOptions, async function (error, info) {
                     if (error) {
-                         res.status(500).send("error en el envio")
+                         res.status(500).json({
+                              message: "error en el envio" + JSON.stringify(error)
+                         })
                     } else {
-                         validador.create({
+                         await validador.create({
                               mail: req.body.data.mail,
                               codigo: codigoReg
                          })
