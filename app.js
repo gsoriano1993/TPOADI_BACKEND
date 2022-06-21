@@ -155,7 +155,7 @@ app.use('/signup', [
                               message: "error en el envio" + JSON.stringify(error)
                          })
                     } else {
-                         await validador.create({
+                         validador.create({
                               mail: req.body.data.mail,
                               codigo: codigoReg
                          })
