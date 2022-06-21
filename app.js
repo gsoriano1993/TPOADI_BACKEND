@@ -13,7 +13,7 @@ const cloudinary = require('./cloudinary')
 const fs = require('fs');
 const logeo = require('./models').logeo;
 const validador = require('./models').validador;
-const recetaModel = require('./models').receta;
+const receta = require('./models').receta;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
@@ -22,17 +22,11 @@ var nodemailer = require('nodemailer');
 var randomExt = require('random-ext');
 /////ENDPOINTS
 /*
-login:
-
-
-olvide contraseña:
-1) me manda alias o correo y envio un mail con codigo
-
-registro:
-1) correo y alias
-2)  envio mail con codigo
-3) validacion del codigo
-
+GET /recetas
+GET /recetas/usuario/:idUsuario
+POST /recetas
+PUT /recetas/:idReceta
+DELETE /recetas/:idReceta
 */
 
 // Log requests to the console.
@@ -344,21 +338,85 @@ app.use('/recover', [
 
 ///******************** RECETAS *********************///
 //** BUSCAR RECETAS DEL USUARIO */
-app.use('/receta/:idReceta', async (req, res) => {
+app.use('/receta/byuser', async (req, res) => {
      try {
           if (req.method === 'GET') {
-               const resultadosRecetas = await usuario.findAll({
-                    include: recetaModel,
+               const resultadosRecetas = await receta.findAll({
                     attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
                     raw: true,
                     where: {
                          idUsuario: req.body.data.idUsuario
                     }
                });
-          }
           if (resultadosRecetas.length === 0) {
                res.status(200).json({
                     message: "No existe esa receta"
+               })
+          }else{
+               res.status(200).json({
+                    message:"receta encontrada",
+                    data: resultadosRecetas
+               })
+          }
+     } }catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+//** ELIMINAR RECETA DEL USUARIO */
+app.use('/receta', async (req, res) => {
+     try {
+          if (req.method === 'DELETE') {
+               const resultadosRecetas = await receta.destroy({
+                    // include: receta,
+                    attributes: ['idUsuario', 'nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
+                    raw: true,
+                    where: {
+                         idReceta: req.body.data.idReceta,
+                         idUsuario: req.body.data.idUsuario
+                    }
+               });
+               if (resultadosRecetas === 1) {
+                    res.status(200).json({
+                         message: "Receta eliminada exitosamente"
+                    })
+               }
+               else{
+                    res.status(200).json({
+                         message: "Receta no encontrada"
+                    })
+               }
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+
+
+//Receta por categoria
+
+app.use('/receta/recetaCategoria', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+
+               const [results, metadata] = await sequelize.query(
+                    "SELECT recetas.* FROM adi.recetas JOIN adi.tipos ON recetas.idTipo = tipos.idTipo"
+                   );
+                  var resultadosCategoria = results.filter(function (e) {return e.descripcion== req.body.data.categoria });
+          }
+          console.log(JSON.stringify(resultadosCategoria, null, 2));
+          if (resultadosCategoria.length === 0) {
+               res.status(200).json({
+                    message: "No existe receta para esa categoria"
                })
           }
      } catch (error) {
@@ -368,6 +426,13 @@ app.use('/receta/:idReceta', async (req, res) => {
           })
      }
 });
+
+
+
+
+
+
+
 
 require('./routes')(app);
 const port = process.env.PORT || 8000;
