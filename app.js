@@ -188,7 +188,7 @@ app.use('/validadorCodigo', async (req, res) => {
                          mail: req.body.data.mail
                     }
                })
-               if (resultadosCodigo === req.body.data.codigo) {
+               if (resultadosCodigo[0] === req.body.data.codigo) {
                     //Borrar código?
                     await validador.destroy({
                          where: { mail: req.body.data.mail }
