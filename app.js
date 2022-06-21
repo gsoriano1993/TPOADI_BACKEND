@@ -135,7 +135,7 @@ app.use('/signup', [
                          ciphers: 'SSLv3'
                     },
                     auth: {
-                         user: 'SoporteBySoporte@hotmail.com',
+                         user: 'soportebyrecetips@hotmail.com',
                          pass: 'Claudiogodio69'
                     }
                });
