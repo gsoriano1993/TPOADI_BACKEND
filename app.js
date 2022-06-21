@@ -18,9 +18,8 @@ const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
 const { check, validationResult } = require('express-validator');
-
-
-
+var nodemailer = require('nodemailer');
+var randomExt = require('random-ext');
 /////ENDPOINTS
 /*
 login:
@@ -140,8 +139,21 @@ app.use('/signup', [
 
 ///envio codigo para avanzar con registro
 app.use('/enviarCodigo', async (req, res) => {
+     if (req.method === 'POST') {
      try {
-          /////////////// GENERA CODIGO Y ENVIA AL USUARIO
+          var transporter = nodemailer.createTransport({
+               host: "smtp-mail.outlook.com", // hostname
+               port: 587, // port for secure SMTP
+               secureConnection: false,
+               tls: {
+                   ciphers: 'SSLv3'
+               },
+               auth: {
+                   user: 'gabrielsoriano.-@hotmail.com',
+                   pass: 'Gabriel199325.'
+               }
+           });
+
           var codigoReg = randomExt.integer(999999, 100000);
           var mailOptions = {
                from: 'Recetips',
@@ -149,12 +161,12 @@ app.use('/enviarCodigo', async (req, res) => {
                subject: 'Alta de usuario',
                text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
           };
-
-          transporter.sendMail(mailOptions, function (error, info) {
+          console.log("llegue hasta aca");
+          console.log(mailOptions);
+          transporter.sendMail(mailOptions, async function (error, info) {
                if (error) {
                     res.status(500).send("error en el envio")
                } else {
-                    //res.status(200).send("correo enviado")
                     validador.create({
                          mail: req.body.data.mail,
                          codigo: codigoReg
@@ -164,6 +176,13 @@ app.use('/enviarCodigo', async (req, res) => {
                     })
                }
           });
+
+
+
+
+          res.status(200).json({
+               message: "mail enviado correctamente"
+          })
      }
      catch (error) {
           console.log("Catch error", error)
@@ -171,8 +190,7 @@ app.use('/enviarCodigo', async (req, res) => {
                message: 'Ocurrio un error inesperado',
           })
      }
-
-});
+}});
 
 //valido si el codigo ingresado por el usuario esta ok
 app.use('/validadorCodigo', async (req, res) => {

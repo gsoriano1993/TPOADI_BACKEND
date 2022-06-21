@@ -21,22 +21,34 @@ exports.sendEmail = function (req, res) {
             pass: 'Gabriel199325.'
         }
     });
-    // Definimos el email
-    var mailOptions = {
-        from: 'Recetips',
-        to: req.body.mail,
-        subject: 'Alta de usuario',
-        text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
-    };
-    // Enviamos el email
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
+   
+  /////////////// GENERA CODIGO Y ENVIA AL USUARIO
+  var codigoReg = randomExt.integer(999999, 100000);
+  var mailOptions = {
+       from: 'Recetips',
+       to: req.body.data.mail,
+       subject: 'Alta de usuario',
+       text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+       if (error) {
             res.status(500).send("error en el envio")
-        } else {
-            res.status(200).send("correo enviado")
-        }
-        /*   funcAux.cargarCodigo(req.body.mail, codigoReg);
-           codigoReg = randomExt.integer(999999, 100000);
-       }*/
-    });
+       } else {
+            validador.create({
+                 mail: req.body.data.mail,
+                 codigo: codigoReg
+            })
+            res.status(200).json({
+                 message: "código creado correctamente"
+            })
+       }
+  });
+
+
+
+
 };
+
+
+
+        
