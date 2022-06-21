@@ -160,9 +160,6 @@ app.use('/signup', [
                          })
                     }
                });
-               res.status(200).json({
-                    message: "mail enviado correctamente"
-               })
           }
      }
 } catch (error) {
