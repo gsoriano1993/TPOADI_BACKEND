@@ -88,7 +88,7 @@ app.use('/signup', [
                }
 
                //valido si mail ya existe
-               const resultadosMail =  await usuario.findAll({
+               const resultadosMail = await usuario.findAll({
                     attributes: ['mail'],
                     raw: true,
                     where: {
@@ -96,7 +96,7 @@ app.use('/signup', [
                     }
                });
                //valido si nickname ya existe
-               const resultadosAlias =  await usuario.findAll({
+               const resultadosAlias = await usuario.findAll({
                     attributes: ['nickname'],
                     raw: true,
                     where: {
@@ -117,7 +117,7 @@ app.use('/signup', [
                }
                console.log(req.body.data.mail);
                if (resultadosMail.length == 0 && resultadosAlias.length == 0) {
-                     usuario.create({
+                    usuario.create({
                          mail: req.body.data.mail,
                          nickname: req.body.data.nickname,
                          habilitado: -1,
@@ -125,72 +125,53 @@ app.use('/signup', [
                          avatar: 'avatar1',
                          tipo_usuario: "INVITADO"
                     })
-                    res.status(200).json({
-                         message: "Mail y alias registrados correctamente"
-                    })
-               }
+               var transporter = nodemailer.createTransport({
+                    host: "smtp-mail.outlook.com", // hostname
+                    port: 587, // port for secure SMTP
+                    secureConnection: false,
+                    tls: {
+                         ciphers: 'SSLv3'
+                    },
+                    auth: {
+                         user: 'gabrielsoriano.-@hotmail.com',
+                         pass: 'Gabriel199325.'
+                    }
+               });
+
+               var codigoReg = randomExt.integer(999999, 100000);
+               var mailOptions = {
+                    from: 'Recetips',
+                    to: req.body.data.mail,
+                    subject: 'Alta de usuario',
+                    text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+               };
+               console.log("llegue hasta aca");
+               console.log(mailOptions);
+               transporter.sendMail(mailOptions, async function (error, info) {
+                    if (error) {
+                         res.status(500).send("error en el envio")
+                    } else {
+                         validador.create({
+                              mail: req.body.data.mail,
+                              codigo: codigoReg
+                         })
+                         res.status(200).json({
+                              message: "código creado correctamente"
+                         })
+                    }
+               });
+               res.status(200).json({
+                    message: "mail enviado correctamente"
+               })
           }
      }
-     catch (err) {
-          console.log("not an array");
-     }
-});
-
-
-///envio codigo para avanzar con registro
-app.use('/enviarCodigo', async (req, res) => {
-     if (req.method === 'POST') {
-     try {
-          var transporter = nodemailer.createTransport({
-               host: "smtp-mail.outlook.com", // hostname
-               port: 587, // port for secure SMTP
-               secureConnection: false,
-               tls: {
-                   ciphers: 'SSLv3'
-               },
-               auth: {
-                   user: 'gabrielsoriano.-@hotmail.com',
-                   pass: 'Gabriel199325.'
-               }
-           });
-
-          var codigoReg = randomExt.integer(999999, 100000);
-          var mailOptions = {
-               from: 'Recetips',
-               to: req.body.data.mail,
-               subject: 'Alta de usuario',
-               text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
-          };
-          console.log("llegue hasta aca");
-          console.log(mailOptions);
-          transporter.sendMail(mailOptions, async function (error, info) {
-               if (error) {
-                    res.status(500).send("error en el envio")
-               } else {
-                    validador.create({
-                         mail: req.body.data.mail,
-                         codigo: codigoReg
-                    })
-                    res.status(200).json({
-                         message: "código creado correctamente"
-                    })
-               }
-          });
-
-
-
-
-          res.status(200).json({
-               message: "mail enviado correctamente"
-          })
-     }
-     catch (error) {
+} catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
-     }
-}});
+}
+})
 
 //valido si el codigo ingresado por el usuario esta ok
 app.use('/validadorCodigo', async (req, res) => {
