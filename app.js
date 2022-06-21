@@ -135,8 +135,8 @@ app.use('/signup', [
                          ciphers: 'SSLv3'
                     },
                     auth: {
-                         user: 'gabrielsoriano.-@hotmail.com',
-                         pass: 'Gabriel199325.'
+                         user: 'SoporteBySoporte@hotmail.com',
+                         pass: 'Claudiogodio69'
                     }
                });
 
@@ -156,6 +156,7 @@ app.use('/signup', [
                               message: "error en el envio" + JSON.stringify(error)
                          })
                     } else {
+                         console.log("Email enviado correctamente");
                          validador.create({
                               mail: req.body.data.mail,
                               codigo: codigoReg
