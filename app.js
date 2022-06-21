@@ -109,11 +109,13 @@ app.use('/signup', [
                     res.status(200).json({
                          message: "mail ya usado"
                     })
+                    return
                };
                if (!(resultadosAlias.length === 0)) {
                     res.status(200).json({
                          message: "nickname ya usado"
                     })
+                    return
                }
                console.log(req.body.data.mail);
                if (resultadosMail.length == 0 && resultadosAlias.length == 0) {
