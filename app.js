@@ -151,6 +151,7 @@ app.use('/signup', [
                console.log(mailOptions);
                transporter.sendMail(mailOptions, async function (error, info) {
                     if (error) {
+                         console.log("Email error", error)
                          res.status(500).json({
                               message: "error en el envio" + JSON.stringify(error)
                          })
