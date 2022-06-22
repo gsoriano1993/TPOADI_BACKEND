@@ -347,8 +347,6 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'GET') {
                const resultadosRecetas = await receta.findAll({
-                    attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
-                    raw: true,
                     where: {
                          idUsuario: req.params.idUsuario
                     }
@@ -400,7 +398,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                });
                res.status(200).json({
-                    message: "Receta eliminada exitosamente"
+                    message: "Receta editada exitosamente"
                })
           }
           if(req.method === 'GET'){
@@ -409,6 +407,54 @@ app.use('/receta/:idReceta', async (req, res) => {
                          idReceta : req.params.idReceta
                     }
                })
+               /* Agregar logica que trae los ingredientes, pasos, unidades, etc 
+               
+               const ingredientesUtilizados = await utilizados.findAll({
+                    where : {
+                         idReceta : req.params.idReceta
+                    }
+               })
+
+               ingredientesUtilizados.map(async (ing) => {
+                    let nombreIng = await ingredientes.findOne({
+                         where : {
+                              idIngrediente : ing.idIngrediente
+                         }
+                    })
+                    if(nombreIng){
+                         return {...ing, "ingrediente" : nombreIng}
+                    }
+                    return ing;
+               })
+
+               let dataIngredientes = [];
+
+               ingredientesUtilizados.forEach((ing) => {
+                    dataIngredientes.push({
+                         "ingrediente": ing.ingrediente,
+                         "unidad": ing.idUnindad,
+                         "cantidad": ing.cantidad
+                    })
+               })
+
+               const dataPasos = await pasos.findAll({
+                    where: {
+                         idReceta: req.params.idReceta
+                    }
+               })
+               
+               */
+               /* 
+               
+               Objeto tentativo a devolver:
+
+               let fullRecipe = {
+                    ...recetaBuscada,
+                    ingredientes: dataIngredientes // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
+                    pasos: dataPasos 
+               }
+
+               */
                if(recetaBuscada){
                     res.status(200).json({
                          message: "receta encontrada",
