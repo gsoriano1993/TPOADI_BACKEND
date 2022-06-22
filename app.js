@@ -257,7 +257,7 @@ app.use('/validarCredenciales', async (req, res) => {
                          message: "mail inexistente"
                     })
                } else {
-                    bcrypt.compare(req.body.data.contrasenia, resultados[0].contrasenia, (error, result) => {
+                    bcrypt.compare(req.body.data.contrasenia, resultados[0].contrasenia, async (error, result) => {
                          if (error) {
                               console.error('Error: ', error);
                          } else {
