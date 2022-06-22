@@ -14,6 +14,8 @@ const fs = require('fs');
 const logeo = require('./models').logeo;
 const validador = require('./models').validador;
 const receta = require('./models').receta;
+const paso = require('./models').paso;
+const foto = require('./models').foto;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
@@ -401,18 +403,46 @@ app.use('/receta', async (req, res) => {
 app.use('/crearReceta', async (req, res) => {
      try {
           if (req.method === 'POST') {
-               console.log("llegue aca");
-               let resultadosCreacion =  receta.create({
-                         idUsuario: req.body.data.idUsuario,
-                         nombre: req.body.data.nombre,
-                         descripcion: req.body.data.descripcion,
-                         foto: req.body.data.foto,
-                         porciones: req.body.data.porciones,
-                         cantidadPersonas: req.body.data.cantidadPersonas,
-                         idTipo: req.body.data.idTipo 
-               }).then (result => console.log(result.idReceta))
+               const resultadosCreacion = await receta.create({
+                    idUsuario: req.body.data.idUsuario,
+                    nombre: req.body.data.nombre,
+                    descripcion: req.body.data.descripcion,
+                    foto: req.body.data.foto,
+                    porciones: req.body.data.porciones,
+                    cantidadPersonas: req.body.data.cantidadPersonas,
+                    idTipo: req.body.data.idTipo
+               })
+               console.log(resultadosCreacion)
+               //busco la ultima receta generada por ese usuario
+               const resultadoCreacionRegistro = await receta.findAll({
+                    attributes: ["idReceta"],
+                    raw: true,
+                    limit: 1,
+                    where: {
+                         idUsuario: req.body.data.idUsuario
+                    },
+                    order: [['idReceta', 'DESC']]
+               })
+
+               console.log(resultadoCreacionRegistro[0].idReceta.toString());  //aca te devuelvo el idReceta
                res.status(200).json({
-                    message: "usuario creado correctamente"
+                    message: "usuario creado correctamente",
+                    data: resultadoCreacionRegistro[0].idReceta.toString()
+               })
+
+
+               //aca cargo el paso  /////// nose como hacer para que cada vez que le den al boton de adicionar se llame de nuevo a este create
+               const resultadoCreacionPaso = await paso.create({
+                    idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
+                    nroPaso: req.body.data.nroPaso,
+                    texto: req.body.data.texto
+               })
+            
+               //cargo foto de la receta --> aca primero tiene que correr el endpoint de '/upload-images'
+               const resultadoCargaFoto = await foto.create({
+                    extension: req.body.data.extension, //buscar en el body del front donde guarda la extension de la imagen
+                    idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
+                    urlFoto: 1//es el resultado de la carga de imagen
                })
           }
      } catch (error) {
@@ -455,37 +485,37 @@ app.use('/receta/crearReceta', async (req, res) => {
 });
 
 */
-  /*   //Receta por categoria   --> A terminar
-     app.use('/receta/recetaCategoria', async (req, res) => {
-          try {
-               if (req.method === 'GET') {
+/*   //Receta por categoria   --> A terminar
+   app.use('/receta/recetaCategoria', async (req, res) => {
+        try {
+             if (req.method === 'GET') {
 
-                    const [results, metadata] = await sequelize.query(
-                         "SELECT recetas.* FROM adi.recetas JOIN adi.tipos ON recetas.idTipo = tipos.idTipo"
-                    );
-                    var resultadosCategoria = results.filter(function (e) { return e.descripcion == req.body.data.categoria });
-               }
-               console.log(JSON.stringify(resultadosCategoria, null, 2));
-               if (resultadosCategoria.length === 0) {
-                    res.status(200).json({
-                         message: "No existe receta para esa categoria"
-                    })
-               }
-          } catch (error) {
-               console.log("Catch error", error)
-               res.status(500).json({
-                    message: 'Ocurrio un error inesperado',
-               })
-          }
-     });
+                  const [results, metadata] = await sequelize.query(
+                       "SELECT recetas.* FROM adi.recetas JOIN adi.tipos ON recetas.idTipo = tipos.idTipo"
+                  );
+                  var resultadosCategoria = results.filter(function (e) { return e.descripcion == req.body.data.categoria });
+             }
+             console.log(JSON.stringify(resultadosCategoria, null, 2));
+             if (resultadosCategoria.length === 0) {
+                  res.status(200).json({
+                       message: "No existe receta para esa categoria"
+                  })
+             }
+        } catch (error) {
+             console.log("Catch error", error)
+             res.status(500).json({
+                  message: 'Ocurrio un error inesperado',
+             })
+        }
+   });
 
 */
 
-     require('./routes')(app);
-     const port = process.env.PORT || 8000;
-     app.set('port', port);
-     const server = http.createServer(app);
-     server.listen(port);
-     module.exports = app;
+require('./routes')(app);
+const port = process.env.PORT || 8000;
+app.set('port', port);
+const server = http.createServer(app);
+server.listen(port);
+module.exports = app;
 
 
