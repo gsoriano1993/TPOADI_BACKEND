@@ -41,6 +41,7 @@ app.use(cors({ origin: '*' }));
 app.use('/upload-images', upload.array('image'), async (req, res) => {
      try {
           const uploader = async (path) => cloudinary.uploads(path, 'Images');
+          console.log(req.body.data)
           if (req.method === 'POST') {
                const urls = []
                const files = req.body.data.files;
