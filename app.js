@@ -495,7 +495,7 @@ app.use('/receta/:idReceta', async (req, res) => {
      }
 });
 
-app.use('/crearReceta', async (req, res) => {
+app.use('/receta/:idUsuario', async (req, res) => {
      console.log("aca voy a empezar el try")
      try {
           if (req.method === 'POST') {
