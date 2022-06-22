@@ -335,6 +335,7 @@ app.use('/recover', [
                     //envio el mail y cargo el codigo en la tabla
                     transporter.sendMail(mailOptions, function (error, info) {
                          if (error) {
+                              console.log("Erorr al enviar el mail: ",error)
                               res.status(500).send("error en el envio")
                          } else {
                               //res.status(200).send("correo enviado")
