@@ -531,10 +531,12 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                console.log("ahora entro en el bucle de la longitud")
 
                req.body.data.ingredientes.forEach(elem => {
-                    await ingrediente.create({
+                    ingrediente.create({
                          nombre: elem.ingrediente,
                     })
                     console.log(elem.ingrediente)
+
+
                });
 
                console.log("aca voy a imprimir la longitud del array de los pasos")     
