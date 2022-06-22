@@ -521,21 +521,41 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     },
                     order: [['idReceta', 'DESC']]
                })
+
+               const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
+
                console.log("aca imprimo el id de receta")
-               console.log(resultadoCreacionRegistro[0].idReceta.toString());  //aca te devuelvo el idReceta
+               console.log(idRecetaCreado);  //aca te devuelvo el idReceta
                res.status(200).json({
                     message: "usuario creado correctamente",
-                    data: resultadoCreacionRegistro[0].idReceta.toString()
+                    data: idRecetaCreado
                })
                console.log("aca imprimo la longitud del array de ingredientes")
                console.log("ahora entro en el bucle de la longitud")
 
                req.body.data.ingredientes.forEach(elem => {
+                    
                     ingrediente.create({
                          nombre: elem.ingrediente,
                     })
-                    console.log(elem.ingrediente)
 
+                    utilizado.create({
+                         cantidad: elem.cantidad,
+                    })
+
+               });
+
+               req.body.data.pasos.forEach(elem => {
+                    
+                    pasos.create({
+                         idReceta: idRecetaCreado,
+                         nroPaso: elem.ingrediente,
+                         texto: elem.ingrediente,
+                    })
+
+                    utilizado.create({
+                         cantidad: elem.cantidad,
+                    })
 
                });
 
