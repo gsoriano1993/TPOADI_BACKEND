@@ -392,7 +392,7 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
 
 
 //** OBTENER, EDITAR Y ELIMINAR RECETAS => Por su ID (Porque en el front uno selecciona una receta que ya fue obtenida previamente, y se tiene el idReceta disponible) */
-app.use('/receta/:idReceta', async (req, res) => {
+app.use('/crearReceta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
                const resultadosRecetas = await receta.destroy({
