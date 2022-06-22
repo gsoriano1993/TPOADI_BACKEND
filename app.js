@@ -38,7 +38,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ origin: '*' }));
 
 ///******************** CARGA DE IMAGENES *********************///
-app.use('/upload-images', upload.array('image'), async (req, res) => {
+// app.use('/upload-images', upload.array('image'), async (req, res) => {
+app.use('/uploadimages', upload.array('image'), async (req, res) => {
      try {
           const uploader = async (path) => cloudinary.uploads(path, 'Images');
           console.log("body",req.body)
