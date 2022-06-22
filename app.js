@@ -506,7 +506,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     descripcion: req.body.data.descripcion,
                     foto: req.body.data.foto,
                     porciones: req.body.data.porciones,
-                    cantidadPersonas: req.body.data.cantidadPersonas,
+                    cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
                })
                console.log(resultadosCreacion)
