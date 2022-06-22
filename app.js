@@ -340,6 +340,7 @@ app.use('/recover', [
 //** BUSCAR RECETAS DEL USUARIO */
 app.use('/receta/byuser', async (req, res) => {
      try {
+          console.log(resp.body.data)
           if (req.method === 'GET') {
                const resultadosRecetas = await receta.findAll({
                     attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
@@ -348,24 +349,24 @@ app.use('/receta/byuser', async (req, res) => {
                          idUsuario: req.body.data.idUsuario
                     }
                });
-          if (resultadosRecetas.length === 0) {
-               res.status(200).json({
-                    message: "No existe esa receta"
-               })
-          }else{
-               res.status(200).json({
-                    message:"receta encontrada",
-                    data: resultadosRecetas
-               })
-          }
-     } }catch (error) {
+               if (resultadosRecetas.length === 0) {
+                    res.status(200).json({
+                         message: "No existe esa receta"
+                    })
+               }else{
+                    res.status(200).json({
+                         message:"receta encontrada",
+                         data: resultadosRecetas
+                    })
+               }
+          } 
+     }catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
      }
 });
-
 
 //** ELIMINAR RECETA DEL USUARIO */
 app.use('/receta', async (req, res) => {
