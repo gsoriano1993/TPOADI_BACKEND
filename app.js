@@ -144,6 +144,7 @@ app.use('/signup', [
                     };
                     console.log("llegue hasta aca");
                     console.log(mailOptions);
+                    
                     transporter.sendMail(mailOptions, async function (error, info) {
                          if (error) {
                               console.log("Email error", error)
@@ -317,6 +318,20 @@ app.use('/recover', [
                          subject: 'Recupero de contraseña',
                          text: 'Hola! El código que debés ingresar para recuperar tu clave es ' + codigoReg
                     };
+
+                    var transporter = nodemailer.createTransport({
+                         host: "smtp-mail.outlook.com", // hostname
+                         port: 587, // port for secure SMTP
+                         secureConnection: false,
+                         tls: {
+                              ciphers: 'SSLv3'
+                         },
+                         auth: {
+                              user: 'soportebyrecetips@hotmail.com',
+                              pass: 'Claudiogodio69'
+                         }
+                    });
+
                     //envio el mail y cargo el codigo en la tabla
                     transporter.sendMail(mailOptions, function (error, info) {
                          if (error) {
