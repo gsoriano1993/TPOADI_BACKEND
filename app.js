@@ -501,7 +501,7 @@ app.use('/crearReceta', async (req, res) => {
           if (req.method === 'POST') {
                console.log("carga de receta")
                const resultadosCreacion = await receta.create({
-                    idUsuario: req.body.data.idUsuario,
+                    idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
                     descripcion: req.body.data.descripcion,
                     foto: req.body.data.foto,
@@ -517,7 +517,7 @@ app.use('/crearReceta', async (req, res) => {
                     raw: true,
                     limit: 1,
                     where: {
-                         idUsuario: req.body.data.idUsuario
+                         idUsuario: req.params.idUsuario
                     },
                     order: [['idReceta', 'DESC']]
                })
