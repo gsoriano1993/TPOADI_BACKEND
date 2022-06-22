@@ -338,23 +338,23 @@ app.use('/recover', [
 
 ///******************** RECETAS *********************///
 //** BUSCAR RECETAS DEL USUARIO */
-app.use('/recetabyuser', async (req, res) => {
+app.use('/recetabyuser/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'GET') {
                const resultadosRecetas = await receta.findAll({
                     attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
                     raw: true,
                     where: {
-                         idUsuario: req.body.data.idUsuario
+                         idUsuario: req.params.idUsuario
                     }
                });
                if (resultadosRecetas.length === 0) {
                     res.status(200).json({
-                         message: "No existe esa receta"
+                         message: "Este usuario no posee recetas"
                     })
                } else {
                     res.status(200).json({
-                         message: "receta encontrada",
+                         message: "recetas encontrada",
                          data: resultadosRecetas
                     })
                }
@@ -368,17 +368,13 @@ app.use('/recetabyuser', async (req, res) => {
 });
 
 
-//** ELIMINAR RECETA DEL USUARIO */
-app.use('/receta', async (req, res) => {
+//** OBTENER, EDITAR Y ELIMINAR RECETAS => Por su ID (Porque en el front uno selecciona una receta que ya fue obtenida previamente, y se tiene el idReceta disponible) */
+app.use('/receta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
                const resultadosRecetas = await receta.destroy({
-                    // include: receta,
-                    attributes: ['idUsuario', 'nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
-                    raw: true,
                     where: {
-                         idReceta: req.body.data.idReceta,
-                         idUsuario: req.body.data.idUsuario
+                         idReceta: req.params.idReceta,
                     }
                });
                if (resultadosRecetas === 1) {
@@ -390,6 +386,34 @@ app.use('/receta', async (req, res) => {
                     res.status(200).json({
                          message: "Receta no encontrada"
                     })
+               }
+          }
+          if (req.method === 'PUT') {
+               await receta.update(req.body,{
+                    where: {
+                         idReceta: req.params.idReceta,
+                    }
+               });
+               res.status(200).json({
+                    message: "Receta eliminada exitosamente"
+               })
+          }
+          if(req.method === 'GET'){
+               const recetaBuscada = await receta.findOne({
+                    where : {
+                         idReceta : req.params.idReceta
+                    }
+               })
+               if(recetaBuscada){
+                    res.status(200).json({
+                         message: "receta encontrada",
+                         data: recetaBuscada
+                    });
+               }
+               else {
+                    res.status(200).json({
+                         message: "receta no encontrada"
+                    });
                }
           }
      } catch (error) {
