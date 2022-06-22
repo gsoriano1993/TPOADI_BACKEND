@@ -43,7 +43,7 @@ app.use('/upload-images', upload.array('image'), async (req, res) => {
           const uploader = async (path) => cloudinary.uploads(path, 'Images');
           if (req.method === 'POST') {
                const urls = []
-               const files = req.files;
+               const files = req.body.data.files;
                for (const file of files) {
                     const { path } = file;
                     const newPath = await uploader(path)
