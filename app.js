@@ -340,7 +340,7 @@ app.use('/recover', [
 //** BUSCAR RECETAS DEL USUARIO */
 app.use('/receta/byuser', async (req, res) => {
      try {
-          console.log(resp.body.data)
+          console.log(req.body.data)
           if (req.method === 'GET') {
                const resultadosRecetas = await receta.findAll({
                     attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
