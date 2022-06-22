@@ -130,8 +130,8 @@ app.use('/signup', [
                               ciphers: 'SSLv3'
                          },
                          auth: {
-                              user: 'soportebyrecetips@hotmail.com',
-                              pass: 'Claudiogodio69'
+                              user: 'recetips_1@hotmail.com',
+                              pass: 'A0303456'
                          }
                     });
 
@@ -327,8 +327,8 @@ app.use('/recover', [
                               ciphers: 'SSLv3'
                          },
                          auth: {
-                              user: 'soportebyrecetips@hotmail.com',
-                              pass: 'Claudiogodio69'
+                              user: 'recetips_1@hotmail.com',
+                              pass: 'A0303456'
                          }
                     });
 
