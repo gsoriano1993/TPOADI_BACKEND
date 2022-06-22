@@ -16,6 +16,7 @@ const validador = require('./models').validador;
 const receta = require('./models').receta;
 const paso = require('./models').paso;
 const foto = require('./models').foto;
+const ingrediente = require('./models').ingrediente;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
@@ -42,8 +43,8 @@ app.use(cors({ origin: '*' }));
 app.use('/uploadimages', upload.array('image'), async (req, res) => {
      try {
           const uploader = async (path) => cloudinary.uploads(path, 'Images');
-          console.log("body",req.body)
-          console.log("data",req.body.data)
+          console.log("body", req.body)
+          console.log("data", req.body.data)
           if (req.method === 'POST') {
                const urls = []
                const files = req.body.data.files;
@@ -146,7 +147,7 @@ app.use('/signup', [
                     };
                     console.log("llegue hasta aca");
                     console.log(mailOptions);
-                    
+
                     transporter.sendMail(mailOptions, async function (error, info) {
                          if (error) {
                               console.log("Email error", error)
@@ -274,7 +275,7 @@ app.use('/validarCredenciales', async (req, res) => {
                                    });
                                    res.status(200).json({
                                         message: "credenciales ok, bienvenido",
-                                        user : dataUsuario
+                                        user: dataUsuario
                                    })
                               } else {
                                    res.status(200).json({
@@ -337,7 +338,7 @@ app.use('/recover', [
                     //envio el mail y cargo el codigo en la tabla
                     transporter.sendMail(mailOptions, function (error, info) {
                          if (error) {
-                              console.log("Erorr al enviar el mail: ",error)
+                              console.log("Erorr al enviar el mail: ", error)
                               res.status(500).send("error en el envio")
                          } else {
                               //res.status(200).send("correo enviado")
@@ -411,7 +412,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
           }
           if (req.method === 'PUT') {
-               await receta.update(req.body,{
+               await receta.update(req.body, {
                     where: {
                          idReceta: req.params.idReceta,
                     }
@@ -420,10 +421,10 @@ app.use('/receta/:idReceta', async (req, res) => {
                     message: "Receta editada exitosamente"
                })
           }
-          if(req.method === 'GET'){
+          if (req.method === 'GET') {
                const recetaBuscada = await receta.findOne({
-                    where : {
-                         idReceta : req.params.idReceta
+                    where: {
+                         idReceta: req.params.idReceta
                     }
                })
                /* Agregar logica que trae los ingredientes, pasos, unidades, etc 
@@ -474,7 +475,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
 
                */
-               if(recetaBuscada){
+               if (recetaBuscada) {
                     res.status(200).json({
                          message: "receta encontrada",
                          data: recetaBuscada
@@ -495,8 +496,10 @@ app.use('/receta/:idReceta', async (req, res) => {
 });
 
 app.use('/crearReceta', async (req, res) => {
+     console.log("aca voy a empezar el try")
      try {
           if (req.method === 'POST') {
+               console.log("carga de receta")
                const resultadosCreacion = await receta.create({
                     idUsuario: req.body.data.idUsuario,
                     nombre: req.body.data.nombre,
@@ -508,6 +511,7 @@ app.use('/crearReceta', async (req, res) => {
                })
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
+               
                const resultadoCreacionRegistro = await receta.findAll({
                     attributes: ["idReceta"],
                     raw: true,
@@ -517,27 +521,39 @@ app.use('/crearReceta', async (req, res) => {
                     },
                     order: [['idReceta', 'DESC']]
                })
-
+               console.log("aca imprimo el id de receta")
                console.log(resultadoCreacionRegistro[0].idReceta.toString());  //aca te devuelvo el idReceta
                res.status(200).json({
                     message: "usuario creado correctamente",
                     data: resultadoCreacionRegistro[0].idReceta.toString()
                })
+               const longitudIng = req.body.ingredientes.length;
+               console.log("aca imprimo la longitud del array de ingredientes")
+               console.log(longitudIng)
+               while (longitudIng > 0) {
+                    await ingrediente.create({
+                         nombre: req.body.ingredientes[longitudIng].ingrediente,
+                    })
+                    longitudIng--;
+               }
 
-
-               //aca cargo el paso  /////// nose como hacer para que cada vez que le den al boton de adicionar se llame de nuevo a este create
+               console.log("aca voy a imprimir la longitud del array de los pasos")     
+               const longitud = req.body.nroPaso.length;
+               console.log(longitud);
+                         /*
+               //aca cargo el paso
                const resultadoCreacionPaso = await paso.create({
                     idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
                     nroPaso: req.body.data.nroPaso,
                     texto: req.body.data.texto
                })
-            
+
                //cargo foto de la receta --> aca primero tiene que correr el endpoint de '/upload-images'
                const resultadoCargaFoto = await foto.create({
                     extension: req.body.data.extension, //buscar en el body del front donde guarda la extension de la imagen
                     idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
                     urlFoto: 1//es el resultado de la carga de imagen
-               })
+               })*/
           }
      } catch (error) {
           console.log("Catch error", error)
