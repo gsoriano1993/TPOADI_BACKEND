@@ -20,13 +20,11 @@ const mailController = require('./controllers/mailCtrl')
 const { check, validationResult } = require('express-validator');
 var nodemailer = require('nodemailer');
 var randomExt = require('random-ext');
+
 /////ENDPOINTS
 /*
-GET /recetas
-GET /recetas/usuario/:idUsuario
 POST /recetas
 PUT /recetas/:idReceta
-DELETE /recetas/:idReceta
 */
 
 // Log requests to the console.
@@ -121,53 +119,53 @@ app.use('/signup', [
                          avatar: 'avatar1',
                          tipo_usuario: "INVITADO"
                     })
-               var transporter = nodemailer.createTransport({
-                    host: "smtp-mail.outlook.com", // hostname
-                    port: 587, // port for secure SMTP
-                    secureConnection: false,
-                    tls: {
-                         ciphers: 'SSLv3'
-                    },
-                    auth: {
-                         user: 'soportebyrecetips@hotmail.com',
-                         pass: 'Claudiogodio69'
-                    }
-               });
+                    var transporter = nodemailer.createTransport({
+                         host: "smtp-mail.outlook.com", // hostname
+                         port: 587, // port for secure SMTP
+                         secureConnection: false,
+                         tls: {
+                              ciphers: 'SSLv3'
+                         },
+                         auth: {
+                              user: 'soportebyrecetips@hotmail.com',
+                              pass: 'Claudiogodio69'
+                         }
+                    });
 
-               var codigoReg = randomExt.integer(999999, 100000);
-               var mailOptions = {
-                    from: 'Recetips',
-                    to: req.body.data.mail,
-                    subject: 'Alta de usuario',
-                    text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
-               };
-               console.log("llegue hasta aca");
-               console.log(mailOptions);
-               transporter.sendMail(mailOptions, async function (error, info) {
-                    if (error) {
-                         console.log("Email error", error)
-                         res.status(500).json({
-                              message: "error en el envio" + JSON.stringify(error)
-                         })
-                    } else {
-                         console.log("Email enviado correctamente");
-                         validador.create({
-                              mail: req.body.data.mail,
-                              codigo: codigoReg
-                         })
-                         res.status(200).json({
-                              message: "código creado correctamente"
-                         })
-                    }
-               });
+                    var codigoReg = randomExt.integer(999999, 100000);
+                    var mailOptions = {
+                         from: 'Recetips',
+                         to: req.body.data.mail,
+                         subject: 'Alta de usuario',
+                         text: 'Hola! El valor que debés ingresar para finalizar el registro es ' + codigoReg
+                    };
+                    console.log("llegue hasta aca");
+                    console.log(mailOptions);
+                    transporter.sendMail(mailOptions, async function (error, info) {
+                         if (error) {
+                              console.log("Email error", error)
+                              res.status(500).json({
+                                   message: "error en el envio" + JSON.stringify(error)
+                              })
+                         } else {
+                              console.log("Email enviado correctamente");
+                              validador.create({
+                                   mail: req.body.data.mail,
+                                   codigo: codigoReg
+                              })
+                              res.status(200).json({
+                                   message: "código creado correctamente"
+                              })
+                         }
+                    });
+               }
           }
-     }
-} catch (error) {
+     } catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
-}
+     }
 })
 
 //valido si el codigo ingresado por el usuario esta ok
@@ -338,9 +336,8 @@ app.use('/recover', [
 
 ///******************** RECETAS *********************///
 //** BUSCAR RECETAS DEL USUARIO */
-app.use('/receta/byuser', async (req, res) => {
+app.use('/recetabyuser', async (req, res) => {
      try {
-          console.log(req.body.data)
           if (req.method === 'GET') {
                const resultadosRecetas = await receta.findAll({
                     attributes: ['nombre', 'descripcion', 'porciones', 'cantidadPersonas'],
@@ -353,20 +350,21 @@ app.use('/receta/byuser', async (req, res) => {
                     res.status(200).json({
                          message: "No existe esa receta"
                     })
-               }else{
+               } else {
                     res.status(200).json({
-                         message:"receta encontrada",
+                         message: "receta encontrada",
                          data: resultadosRecetas
                     })
                }
-          } 
-     }catch (error) {
+          }
+     } catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
      }
 });
+
 
 //** ELIMINAR RECETA DEL USUARIO */
 app.use('/receta', async (req, res) => {
@@ -386,7 +384,7 @@ app.use('/receta', async (req, res) => {
                          message: "Receta eliminada exitosamente"
                     })
                }
-               else{
+               else {
                     res.status(200).json({
                          message: "Receta no encontrada"
                     })
@@ -400,24 +398,21 @@ app.use('/receta', async (req, res) => {
      }
 });
 
-
-
-
-//Receta por categoria
-
-app.use('/receta/recetaCategoria', async (req, res) => {
+app.use('/crearReceta', async (req, res) => {
      try {
-          if (req.method === 'GET') {
-
-               const [results, metadata] = await sequelize.query(
-                    "SELECT recetas.* FROM adi.recetas JOIN adi.tipos ON recetas.idTipo = tipos.idTipo"
-                   );
-                  var resultadosCategoria = results.filter(function (e) {return e.descripcion== req.body.data.categoria });
-          }
-          console.log(JSON.stringify(resultadosCategoria, null, 2));
-          if (resultadosCategoria.length === 0) {
+          if (req.method === 'POST') {
+               console.log("llegue aca");
+               let resultadosCreacion =  receta.create({
+                         idUsuario: req.body.data.idUsuario,
+                         nombre: req.body.data.nombre,
+                         descripcion: req.body.data.descripcion,
+                         foto: req.body.data.foto,
+                         porciones: req.body.data.porciones,
+                         cantidadPersonas: req.body.data.cantidadPersonas,
+                         idTipo: req.body.data.idTipo 
+               }).then (result => console.log(result.idReceta))
                res.status(200).json({
-                    message: "No existe receta para esa categoria"
+                    message: "usuario creado correctamente"
                })
           }
      } catch (error) {
@@ -429,16 +424,68 @@ app.use('/receta/recetaCategoria', async (req, res) => {
 });
 
 
+/*
+//CREAR RECETA
+app.use('/receta/crearReceta', async (req, res) => {
+     try {
+          if (req.method === 'POST') {
+                    await  receta.create({
+                    idUsuario: req.body.data.idUsuario,
+                    nombre: req.body.data.nombre,
+                    descripcion: req.body.data.descripcion,
+                    foto: req.body.data.foto,
+                    porciones: req.body.data.porciones,
+                    cantidadPersonas: req.body.data.cantidadPersonas,
+                    idTipo: req.body.data.idTipo //a chequear
+               }).then (result => console.log(result.idReceta))
+               /*const getIdReceta = await receta.findAll({
+                    attributes:["idReceta"],
+                    raw: true,
+                    where: {
+                         idUsuario: req.body.data.idUsuario
+                    }
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
 
+*/
+  /*   //Receta por categoria   --> A terminar
+     app.use('/receta/recetaCategoria', async (req, res) => {
+          try {
+               if (req.method === 'GET') {
 
+                    const [results, metadata] = await sequelize.query(
+                         "SELECT recetas.* FROM adi.recetas JOIN adi.tipos ON recetas.idTipo = tipos.idTipo"
+                    );
+                    var resultadosCategoria = results.filter(function (e) { return e.descripcion == req.body.data.categoria });
+               }
+               console.log(JSON.stringify(resultadosCategoria, null, 2));
+               if (resultadosCategoria.length === 0) {
+                    res.status(200).json({
+                         message: "No existe receta para esa categoria"
+                    })
+               }
+          } catch (error) {
+               console.log("Catch error", error)
+               res.status(500).json({
+                    message: 'Ocurrio un error inesperado',
+               })
+          }
+     });
 
+*/
 
+     require('./routes')(app);
+     const port = process.env.PORT || 8000;
+     app.set('port', port);
+     const server = http.createServer(app);
+     server.listen(port);
+     module.exports = app;
 
-
-require('./routes')(app);
-const port = process.env.PORT || 8000;
-app.set('port', port);
-const server = http.createServer(app);
-server.listen(port);
-module.exports = app;
 
