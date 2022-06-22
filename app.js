@@ -530,10 +530,13 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                const longitudIng = req.body.ingredientes.length;
                console.log("aca imprimo la longitud del array de ingredientes")
                console.log(longitudIng)
+               console.log("ahora entro en el bucle de la longitud")
                while (longitudIng > 0) {
                     await ingrediente.create({
                          nombre: req.body.ingredientes[longitudIng].ingrediente,
                     })
+                    console.log(longitudIng)
+                    console.log(req.body.ingredientes[longitudIng].ingrediente)
                     longitudIng--;
                }
 
