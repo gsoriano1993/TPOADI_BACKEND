@@ -527,21 +527,21 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     message: "usuario creado correctamente",
                     data: resultadoCreacionRegistro[0].idReceta.toString()
                })
-               const longitudIng = req.body.ingredientes.length;
+               const longitudIng = req.body.data.ingredientes.length;
                console.log("aca imprimo la longitud del array de ingredientes")
                console.log(longitudIng)
                console.log("ahora entro en el bucle de la longitud")
                while (longitudIng > 0) {
                     await ingrediente.create({
-                         nombre: req.body.ingredientes[longitudIng].ingrediente,
+                         nombre: req.body.data.ingredientes[longitudIng].ingrediente,
                     })
                     console.log(longitudIng)
-                    console.log(req.body.ingredientes[longitudIng].ingrediente)
+                    console.log(req.body.data.ingredientes[longitudIng].ingrediente)
                     longitudIng--;
                }
 
                console.log("aca voy a imprimir la longitud del array de los pasos")     
-               const longitud = req.body.nroPaso.length;
+               const longitud = req.body.data.pasos.length;
                console.log(longitud);
                          /*
                //aca cargo el paso
