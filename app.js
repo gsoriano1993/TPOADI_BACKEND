@@ -263,9 +263,14 @@ app.use('/validarCredenciales', async (req, res) => {
                          } else {
                               //console.log('Credenciales correctas?: ', result ) // true o false
                               if (result === true) {
+                                   const dataUsuario = await usuario.findOne({
+                                        where: {
+                                             mail: req.body.data.mail
+                                        }
+                                   });
                                    res.status(200).json({
-                                        message: "credenciales ok, bienvenido"
-                                        //user : resultados[0]
+                                        message: "credenciales ok, bienvenido",
+                                        user : dataUsuario
                                    })
                               } else {
                                    res.status(200).json({
