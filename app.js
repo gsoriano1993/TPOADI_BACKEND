@@ -545,8 +545,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 
                     paso.create({
                          idReceta: idRecetaCreado,
-                         nroPaso: elem.ingrediente,
-                         texto: elem.ingrediente,
+                         nroPaso: elem.stepNumber,
+                         texto: elem.description,
                     })
                });
                console.log("aca arranco la carga de utilizados")
@@ -556,7 +556,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          raw: true,
                          limit: 1,
                          where: {
-                              ingrediente: req.body.data.ingredientes.ingrediente
+                              ingrediente: elem.ingrediente
                          }
                     })
                     await utilizado.create({
