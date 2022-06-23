@@ -501,7 +501,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
-               let flag = 1;
+
 
                const resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
@@ -531,15 +531,37 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
                console.log("aca arranco la carga de ingredientes")
-          
+               
 
+               let counter = 0;
+               let myIngredients = req.body.data.ingredientes;
+               while(counter < myIngredients.length){
+                    await ingrediente.create({
+                         nombre: myIngredients[counter].ingrediente,
+                         
+                    })
+                    counter++;
+               }
+/*
                req.body.data.ingredientes.forEach(async(elem) => {
                     console.log(elem.ingrediente);
                     await ingrediente.create({
                          nombre: elem.ingrediente,
                     })
                });
+*/
 
+                counter = 0;
+               let myPasos =  req.body.data.pasos;
+               while(counter < myPasos.length){
+                    await paso.create({
+                         idReceta: idRecetaCreado,
+                         nroPaso: myPasos[counter].stepNumber,
+                         texto: myPasos[counter].description,
+                    })
+                    counter++;
+               }
+/*
                console.log("aca arranco la carga de pasos")
                req.body.data.pasos.forEach(async(elem) => {
                     console.log(elem)
@@ -549,7 +571,9 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          texto: elem.description,
                     })
                });
+*/
                console.log("aca arranco la carga de utilizados")
+
                req.body.data.ingredientes.forEach(async(elem) => {
                     const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
