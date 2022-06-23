@@ -370,7 +370,8 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
                const resultadosRecetas = await receta.findAll({
                     where: {
                          idUsuario: req.params.idUsuario
-                    }
+                    },
+                    order: [['idReceta', 'DESC']]
                });
                if (resultadosRecetas.length === 0) {
                     res.status(200).json({
