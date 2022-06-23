@@ -466,9 +466,9 @@ app.use('/receta/:idReceta', async (req, res) => {
                counter = 0;
                while(counter < ingredientsData.length){
                     dataIngredientes.push({
-                         "ingrediente": ingredientsData[0].ingrediente,
-                         "unidad": ingredientsData[0].idUnidad,
-                         "cantidad": ingredientsData[0].cantidad
+                         "ingrediente": ingredientsData[counter].ingrediente,
+                         "unidad": ingredientsData[counter].idUnidad,
+                         "cantidad": ingredientsData[counter].cantidad
                     })
                     counter = counter + 1;
                }
