@@ -534,7 +534,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                console.log("aca arranco la carga de ingredientes")
 
                req.body.data.ingredientes.forEach(async(elem) => {
-
+                    console.log(elem.ingrediente);
                     await ingrediente.create({
                          nombre: elem.ingrediente,
                     })
@@ -542,7 +542,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 
                console.log("aca arranco la carga de pasos")
                req.body.data.pasos.forEach(async(elem) => {
-
+                    console.log(elem)
                     await paso.create({
                          idReceta: idRecetaCreado,
                          nroPaso: elem.stepNumber,
