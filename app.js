@@ -430,21 +430,24 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                })
 
-               const [results, metadata] = await sequelize.query(
+               /*const [results, metadata] = await sequelize.query(
                     "SELECT recetas.*, pasos.*, ingredientes.*, utilizados.* FROM adi.recetas JOIN adi.utilizados ON recetas.idreceta = utilizados.idreceta join adi.ingredientes on ingredientes.idingrediente= utilizados.idingrediente join adi.pasos on pasos.idreceta=recetas.idreceta"
                );
                var resultadosCategoria = results;
                console.log(resultadosCategoria);
                var resultadoFiltrado=resultadosCategoria.filter(elem=>elem.idReceta===req.params.idReceta)
                console.log("ahora muestro filtrado");
-               console.log(resultadoFiltrado)
+               console.log(resultadoFiltrado)*/
                // Agregar logica que trae los ingredientes, pasos, unidades, etc 
               
-               const ingredientesUtilizados = await utilizado.findAll({
+               let ingredientesUtilizados = await utilizado.findAll({
                     where : {
                          idReceta : req.params.idReceta
                     }
                })
+
+               console.log("Utilizados:");
+               console.log(ingredientesUtilizados)
 
                let counter = 0;
                let ingredientsData = []
@@ -455,21 +458,11 @@ app.use('/receta/:idReceta', async (req, res) => {
                          }
                     })
                     if(nombreIng){
-                         ingredientsData.push({...ingredientesUtilizados[counter], "ingrediente" : nombreIng.nombre});
+                         ingredientsData.push({"cantidad": ingredientesUtilizados[counter].cantidad , "ingrediente" : nombreIng.nombre, "unidad":ingredientesUtilizados[counter].idUnidad });
                     }
-                    ingredientsData.push({...ingredientesUtilizados[counter]});
-                    counter = counter + 1;
-               }
-
-               let dataIngredientes = [];
-
-               counter = 0;
-               while(counter < ingredientsData.length){
-                    dataIngredientes.push({
-                         "ingrediente": ingredientsData[counter].ingrediente,
-                         "unidad": ingredientsData[counter].idUnidad,
-                         "cantidad": ingredientsData[counter].cantidad
-                    })
+                    else{
+                         ingredientsData.push({...ingredientesUtilizados[counter]});
+                    }
                     counter = counter + 1;
                }
 
@@ -483,7 +476,7 @@ app.use('/receta/:idReceta', async (req, res) => {
 
                let fullRecipe = {
                     ...recetaBuscada,
-                    ingredientes: [...dataIngredientes], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
+                    ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
                     pasos: [...dataPasos] 
                }
 
