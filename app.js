@@ -527,7 +527,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
                res.status(200).json({
-                    message: "usuario creado correctamente",
+                    message: "Receta creada correctamente",
                     data: idRecetaCreado
                })
                console.log("aca arranco la carga de ingredientes")
@@ -542,7 +542,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                console.log("aca arranco la carga de pasos")
                req.body.data.pasos.forEach(elem => {
 
-                    pasos.create({
+                    paso.create({
                          idReceta: idRecetaCreado,
                          nroPaso: elem.ingrediente,
                          texto: elem.ingrediente,
