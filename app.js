@@ -431,7 +431,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                })
 
                const [results, metadata] = await sequelize.query(
-                    "SELECT recetas.*, pasos.*, ingredientes.*, utilizados.* FROM adi.recetas JOIN adi.utilizados ON recetas.idreceta = utilizados.idreceta join adi.ingrediente on ingrediente.idingrediente= utilizados.idingrediente join adi.pasos on pasos.idreceta=recetas.idreceta"
+                    "SELECT recetas.*, pasos.*, ingredientes.*, utilizados.* FROM adi.recetas JOIN adi.utilizados ON recetas.idreceta = utilizados.idreceta join adi.ingredientes on ingredientes.idingrediente= utilizados.idingrediente join adi.pasos on pasos.idreceta=recetas.idreceta"
                );
                var resultadosCategoria = results;
                console.log(resultadosCategoria);
@@ -483,10 +483,10 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
 
                */
-               if (recetaBuscada) {
+               if (resultadosCategoria) {
                     res.status(200).json({
                          message: "receta encontrada",
-                         data: recetaBuscada
+                         data: resultadosCategoria
                     });
                }
                else {
