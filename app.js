@@ -559,10 +559,11 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                               nombre: elem.ingrediente
                          }
                     })
+                    console.log(resultadoIngrediente[0])
                     await utilizado.create({
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
-                         idIngrediente: resultadoIngrediente[0].idIngrediente,
+                         idIngrediente: resultadoIngrediente[0].idIngrediente.toString(),
                          idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: null,
                     })
