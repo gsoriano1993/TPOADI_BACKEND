@@ -589,7 +589,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          idReceta: idRecetaCreado,
                          idIngrediente: resultadoIngrediente[0].idIngrediente.toString(),
                          idUnidad: elem.unidad,  //me la pasas por el front
-                         observaciones: null,
+                         observaciones: '',
                     })
 
                });
