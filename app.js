@@ -468,7 +468,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                     })
                })
 
-               const dataPasos = await pasos.findAll({
+               const dataPasos = await paso.findAll({
                     where: {
                          idReceta: req.params.idReceta
                     }
