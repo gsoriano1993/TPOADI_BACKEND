@@ -446,27 +446,32 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                })
 
-               ingredientesUtilizados.map(async (ing) => {
+               let counter = 0;
+               let ingredientsData = []
+               while(counter < ingredientesUtilizados.length){
                     let nombreIng = await ingrediente.findOne({
                          where : {
-                              idIngrediente : ing.idIngrediente
+                              idIngrediente : ingredientesUtilizados[counter].idIngrediente
                          }
                     })
                     if(nombreIng){
-                         return {...ing, "ingrediente" : nombreIng}
+                         ingredientsData.push({...ingredientesUtilizados[counter], "ingrediente" : nombreIng.nombre});
                     }
-                    return ing;
-               })
+                    ingredientsData.push({...ingredientesUtilizados[counter]});
+                    counter = counter + 1;
+               }
 
                let dataIngredientes = [];
 
-               ingredientesUtilizados.forEach((ing) => {
+               counter = 0;
+               while(counter < ingredientsData.length){
                     dataIngredientes.push({
-                         "ingrediente": ing.ingrediente,
-                         "unidad": ing.idUnindad,
-                         "cantidad": ing.cantidad
+                         "ingrediente": ingredientsData[0].ingrediente,
+                         "unidad": ingredientsData[0].idUnidad,
+                         "cantidad": ingredientsData[0].cantidad
                     })
-               })
+                    counter = counter + 1;
+               }
 
                const dataPasos = await paso.findAll({
                     where: {
@@ -474,19 +479,16 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                })
                
-               
-               
-               
               // Objeto tentativo a devolver:
 
                let fullRecipe = {
                     ...recetaBuscada,
-                    ingredientes: dataIngredientes, // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
-                    pasos: dataPasos 
+                    ingredientes: [...dataIngredientes], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
+                    pasos: [...dataPasos] 
                }
 
             
-               if (resultadosCategoria) {
+               if (recetaBuscada) {
                     res.status(200).json({
                          message: "receta encontrada",
                          data: fullRecipe
