@@ -501,6 +501,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
+               let flag = 1;
+
                const resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
@@ -510,9 +512,10 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
                })
+          
+
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
-
                const resultadoCreacionRegistro = await receta.findAll({
                     attributes: ["idReceta"],
                     raw: true,
@@ -522,16 +525,13 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     },
                     order: [['idReceta', 'DESC']]
                })
-
+          
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
 
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
-               res.status(200).json({
-                    message: "Receta creada correctamente",
-                    data: idRecetaCreado
-               })
                console.log("aca arranco la carga de ingredientes")
+          
 
                req.body.data.ingredientes.forEach(async(elem) => {
                     console.log(elem.ingrediente);
@@ -569,6 +569,10 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
 
                });
+               res.status(200).json({
+                    message: "Receta creada correctamente",
+                    data: idRecetaCreado
+               })
                //unidades
                /*
                se carga a mano esa para que el front pase los id 
