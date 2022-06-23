@@ -435,7 +435,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                );
                var resultadosCategoria = results;
                console.log(resultadosCategoria);
-               /* Agregar logica que trae los ingredientes, pasos, unidades, etc 
+               // Agregar logica que trae los ingredientes, pasos, unidades, etc 
                
                const ingredientesUtilizados = await utilizados.findAll({
                     where : {
@@ -444,7 +444,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                })
 
                ingredientesUtilizados.map(async (ing) => {
-                    let nombreIng = await ingredientes.findOne({
+                    let nombreIng = await ingrediente.findOne({
                          where : {
                               idIngrediente : ing.idIngrediente
                          }
@@ -471,22 +471,22 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                })
                
-               */
-               /* 
                
-               Objeto tentativo a devolver:
+               
+               
+              // Objeto tentativo a devolver:
 
                let fullRecipe = {
                     ...recetaBuscada,
-                    ingredientes: dataIngredientes // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
+                    ingredientes: dataIngredientes, // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
                     pasos: dataPasos 
                }
 
-               */
+            
                if (resultadosCategoria) {
                     res.status(200).json({
                          message: "receta encontrada",
-                         data: resultadosCategoria
+                         data: fullRecipe
                     });
                }
                else {
