@@ -435,9 +435,12 @@ app.use('/receta/:idReceta', async (req, res) => {
                );
                var resultadosCategoria = results;
                console.log(resultadosCategoria);
+               var resultadoFiltrado=resultadosCategoria.filter(elem=>elem.idReceta===req.params.idReceta)
+               console.log("ahora muestro filtrado");
+               console.log(resultadoFiltrado)
                // Agregar logica que trae los ingredientes, pasos, unidades, etc 
-               
-               const ingredientesUtilizados = await utilizados.findAll({
+              
+               const ingredientesUtilizados = await utilizado.findAll({
                     where : {
                          idReceta : req.params.idReceta
                     }
