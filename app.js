@@ -563,7 +563,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
                          idIngrediente: resultadoIngrediente,
-                         idUnidad: req.body.data.ingrediente.unidad,  //me la pasas por el front
+                         idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: null,
                     })
 
