@@ -17,6 +17,7 @@ const receta = require('./models').receta;
 const paso = require('./models').paso;
 const foto = require('./models').foto;
 const ingrediente = require('./models').ingrediente;
+const utilizado = require('./models').utilizado;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const mailController = require('./controllers/mailCtrl')
@@ -549,8 +550,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
                });
                console.log("aca arranco la carga de utilizados")
-               req.body.data.ingredientes.forEach(elem => {
-                    const resultadoIngrediente = ingrediente.findAll({
+               req.body.data.ingredientes.forEach(async(elem) => {
+                    const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
                          raw: true,
                          limit: 1,
@@ -558,7 +559,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                               ingrediente: req.body.data.ingredientes.ingrediente
                          }
                     })
-                    utilizado.create({
+                    await utilizado.create({
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
                          idIngrediente: resultadoIngrediente,
