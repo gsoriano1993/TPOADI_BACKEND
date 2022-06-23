@@ -429,6 +429,12 @@ app.use('/receta/:idReceta', async (req, res) => {
                          idReceta: req.params.idReceta
                     }
                })
+
+               const [results, metadata] = await sequelize.query(
+                    "SELECT recetas.*, pasos.*, ingredientes.*, utilizados.* FROM adi.recetas JOIN adi.utilizados ON recetas.idreceta = utilizados.idreceta join adi.ingrediente on ingrediente.idingrediente= utilizados.idingrediente join adi.pasos on pasos.idreceta=recetas.idreceta"
+               );
+               var resultadosCategoria = results;
+               console.log(resultadosCategoria);
                /* Agregar logica que trae los ingredientes, pasos, unidades, etc 
                
                const ingredientesUtilizados = await utilizados.findAll({
@@ -627,37 +633,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 });
 
 
-/*
-//CREAR RECETA
-app.use('/receta/crearReceta', async (req, res) => {
-     try {
-          if (req.method === 'POST') {
-                    await  receta.create({
-                    idUsuario: req.body.data.idUsuario,
-                    nombre: req.body.data.nombre,
-                    descripcion: req.body.data.descripcion,
-                    foto: req.body.data.foto,
-                    porciones: req.body.data.porciones,
-                    cantidadPersonas: req.body.data.cantidadPersonas,
-                    idTipo: req.body.data.idTipo //a chequear
-               }).then (result => console.log(result.idReceta))
-               /*const getIdReceta = await receta.findAll({
-                    attributes:["idReceta"],
-                    raw: true,
-                    where: {
-                         idUsuario: req.body.data.idUsuario
-                    }
-               })
-          }
-     } catch (error) {
-          console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
-          })
-     }
-});
 
-*/
 /*   //Receta por categoria   --> A terminar
    app.use('/receta/recetaCategoria', async (req, res) => {
         try {
