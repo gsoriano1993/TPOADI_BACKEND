@@ -556,7 +556,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          raw: true,
                          limit: 1,
                          where: {
-                              ingrediente: elem.ingrediente
+                              nombre: elem.ingrediente
                          }
                     })
                     await utilizado.create({
