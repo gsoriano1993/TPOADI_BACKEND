@@ -562,7 +562,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     await utilizado.create({
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
-                         idIngrediente: resultadoIngrediente,
+                         idIngrediente: resultadoIngrediente[0].idIngrediente,
                          idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: null,
                     })
