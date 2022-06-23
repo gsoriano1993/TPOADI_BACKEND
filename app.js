@@ -511,7 +511,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
-               
+
                const resultadoCreacionRegistro = await receta.findAll({
                     attributes: ["idReceta"],
                     raw: true,
@@ -530,52 +530,62 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     message: "usuario creado correctamente",
                     data: idRecetaCreado
                })
-               console.log("aca imprimo la longitud del array de ingredientes")
-               console.log("ahora entro en el bucle de la longitud")
+               console.log("aca arranco la carga de ingredientes")
 
                req.body.data.ingredientes.forEach(elem => {
-                    
+
                     ingrediente.create({
                          nombre: elem.ingrediente,
                     })
-
-                    utilizado.create({
-                         cantidad: elem.cantidad,
-                    })
-
                });
 
+               console.log("aca arranco la carga de pasos")
                req.body.data.pasos.forEach(elem => {
-                    
+
                     pasos.create({
                          idReceta: idRecetaCreado,
                          nroPaso: elem.ingrediente,
                          texto: elem.ingrediente,
                     })
-
+               });
+               console.log("aca arranco la carga de utilizados")
+               req.body.data.ingredientes.forEach(elem => {
+                    const resultadoIngrediente = ingrediente.findAll({
+                         attributes: ["idIngrediente"],
+                         raw: true,
+                         limit: 1,
+                         where: {
+                              ingrediente: req.body.data.ingredientes.ingrediente
+                         }
+                    })
                     utilizado.create({
                          cantidad: elem.cantidad,
+                         idReceta: idRecetaCreado,
+                         idIngrediente: resultadoIngrediente,
+                         idUnidad: req.body.data.ingrediente.unidad,  //me la pasas por el front
+                         observaciones: null,
                     })
 
                });
+               //unidades
+               /*
+               se carga a mano esa para que el front pase los id 
+               */
 
-               console.log("aca voy a imprimir la longitud del array de los pasos")     
-               const longitud = req.body.data.pasos.length;
-               console.log(longitud);
-                         /*
-               //aca cargo el paso
-               const resultadoCreacionPaso = await paso.create({
-                    idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
-                    nroPaso: req.body.data.nroPaso,
-                    texto: req.body.data.texto
-               })
+               /*
+     //aca cargo el paso
+     const resultadoCreacionPaso = await paso.create({
+          idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
+          nroPaso: req.body.data.nroPaso,
+          texto: req.body.data.texto
+     })
 
-               //cargo foto de la receta --> aca primero tiene que correr el endpoint de '/upload-images'
-               const resultadoCargaFoto = await foto.create({
-                    extension: req.body.data.extension, //buscar en el body del front donde guarda la extension de la imagen
-                    idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
-                    urlFoto: 1//es el resultado de la carga de imagen
-               })*/
+     //cargo foto de la receta --> aca primero tiene que correr el endpoint de '/upload-images'
+     const resultadoCargaFoto = await foto.create({
+          extension: req.body.data.extension, //buscar en el body del front donde guarda la extension de la imagen
+          idReceta: resultadoCreacionRegistro[0].idReceta.toString(),
+          urlFoto: 1//es el resultado de la carga de imagen
+     })*/
           }
      } catch (error) {
           console.log("Catch error", error)
