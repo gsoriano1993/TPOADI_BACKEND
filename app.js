@@ -561,8 +561,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                while(counter < myPasos.length){
                     await paso.create({
                          idReceta: idRecetaCreado,
-                         nroPaso: myPasos[counter].stepNumber,
-                         texto: myPasos[counter].description,
+                         nroPaso: myPasos[counter].nroPaso,
+                         texto: myPasos[counter].texto,
                     })
                     counter++;
                }
