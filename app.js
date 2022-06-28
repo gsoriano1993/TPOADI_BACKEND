@@ -402,9 +402,16 @@ app.use('/receta/:idReceta', async (req, res) => {
                await paso.destroy({
                     where: { idReceta: req.params.idReceta }
                });
-               await ingrediente.destroy({
-                    where: { idReceta: req.params.idReceta }
+
+               const idIngredientes= await utilizado.findAll({
+                    attributes: ["idIngrediente"],
+                    where:{ idReceta: req.params.idReceta}
                })
+
+               await ingrediente.destroy({
+                    where: { idIngrediente: {[Op.in]:idIngredientes }}
+               })
+               
                await utilizado.destroy({
                     where: { idReceta: req.params.idReceta}
                })
