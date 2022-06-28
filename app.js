@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const cors = require('cors');
 const { sequelize } = require('./models');
-const Sequelize = require('sequelize');
+const { Sequelize, Op } = require("sequelize");
 // Set up the express app
 const app = express();
 const upload = require('./multer')
@@ -411,7 +411,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                await ingrediente.destroy({
                     where: { idIngrediente: {[Op.in]:idIngredientes }}
                })
-               
+
                await utilizado.destroy({
                     where: { idReceta: req.params.idReceta}
                })
