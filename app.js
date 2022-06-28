@@ -20,6 +20,8 @@ const ingrediente = require('./models').ingrediente;
 const utilizado = require('./models').utilizado;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
+const conversion = require('./models').conversiones;
+const personalizacion = require('./models').personalizado;
 const mailController = require('./controllers/mailCtrl')
 const { check, validationResult } = require('express-validator');
 var nodemailer = require('nodemailer');
@@ -397,11 +399,22 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
 app.use('/receta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
-               const resultadosRecetas = await receta.destroy({
-                    where: {
-                         idReceta: req.params.idReceta,
-                    }
+               await paso.destroy({
+                    where: { idReceta: req.params.idReceta }
                });
+               await ingrediente.destroy({
+                    where: { idReceta: req.params.idReceta }
+               })
+               await utilizado.destroy({
+                    where: { idReceta: req.params.idReceta}
+               })
+               await foto.destroy({
+                    where: {idReceta: req.params.idReceta}
+               })
+               const resultadosRecetas = await receta.destroy({
+                    where: { idReceta: req.params.idReceta }
+               });
+               console.log(`recetas eliminadas: ${resultadosRecetas}`)
                if (resultadosRecetas === 1) {
                     res.status(200).json({
                          message: "Receta eliminada exitosamente"
@@ -439,10 +452,10 @@ app.use('/receta/:idReceta', async (req, res) => {
                console.log("ahora muestro filtrado");
                console.log(resultadoFiltrado)*/
                // Agregar logica que trae los ingredientes, pasos, unidades, etc 
-              
+
                let ingredientesUtilizados = await utilizado.findAll({
-                    where : {
-                         idReceta : req.params.idReceta
+                    where: {
+                         idReceta: req.params.idReceta
                     }
                })
 
@@ -451,17 +464,17 @@ app.use('/receta/:idReceta', async (req, res) => {
 
                let counter = 0;
                let ingredientsData = []
-               while(counter < ingredientesUtilizados.length){
+               while (counter < ingredientesUtilizados.length) {
                     let nombreIng = await ingrediente.findOne({
-                         where : {
-                              idIngrediente : ingredientesUtilizados[counter].idIngrediente
+                         where: {
+                              idIngrediente: ingredientesUtilizados[counter].idIngrediente
                          }
                     })
-                    if(nombreIng){
-                         ingredientsData.push({"cantidad": ingredientesUtilizados[counter].cantidad , "ingrediente" : nombreIng.nombre, "unidad":ingredientesUtilizados[counter].idUnidad });
+                    if (nombreIng) {
+                         ingredientsData.push({ "cantidad": ingredientesUtilizados[counter].cantidad, "ingrediente": nombreIng.nombre, "unidad": ingredientesUtilizados[counter].idUnidad });
                     }
-                    else{
-                         ingredientsData.push({...ingredientesUtilizados[counter]});
+                    else {
+                         ingredientsData.push({ ...ingredientesUtilizados[counter] });
                     }
                     counter = counter + 1;
                }
@@ -471,16 +484,16 @@ app.use('/receta/:idReceta', async (req, res) => {
                          idReceta: req.params.idReceta
                     }
                })
-               
-              // Objeto tentativo a devolver:
+
+               // Objeto tentativo a devolver:
 
                let fullRecipe = {
                     ...recetaBuscada,
                     ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
-                    pasos: [...dataPasos] 
+                    pasos: [...dataPasos]
                }
 
-            
+
                if (recetaBuscada) {
                     res.status(200).json({
                          message: "receta encontrada",
@@ -517,7 +530,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
                })
-          
+
 
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
@@ -530,35 +543,35 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     },
                     order: [['idReceta', 'DESC']]
                })
-          
+
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
 
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
                console.log("aca arranco la carga de ingredientes")
-               
+
 
                let counter = 0;
                let myIngredients = req.body.data.ingredientes;
-               while(counter < myIngredients.length){
+               while (counter < myIngredients.length) {
                     await ingrediente.create({
                          nombre: myIngredients[counter].ingrediente,
-                         
+
                     })
                     counter++;
                }
-/*
-               req.body.data.ingredientes.forEach(async(elem) => {
-                    console.log(elem.ingrediente);
-                    await ingrediente.create({
-                         nombre: elem.ingrediente,
-                    })
-               });
-*/
+               /*
+                              req.body.data.ingredientes.forEach(async(elem) => {
+                                   console.log(elem.ingrediente);
+                                   await ingrediente.create({
+                                        nombre: elem.ingrediente,
+                                   })
+                              });
+               */
 
-                counter = 0;
-               let myPasos =  req.body.data.pasos;
-               while(counter < myPasos.length){
+               counter = 0;
+               let myPasos = req.body.data.pasos;
+               while (counter < myPasos.length) {
                     await paso.create({
                          idReceta: idRecetaCreado,
                          nroPaso: myPasos[counter].nroPaso,
@@ -566,20 +579,20 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
                     counter++;
                }
-/*
-               console.log("aca arranco la carga de pasos")
-               req.body.data.pasos.forEach(async(elem) => {
-                    console.log(elem)
-                    await paso.create({
-                         idReceta: idRecetaCreado,
-                         nroPaso: elem.stepNumber,
-                         texto: elem.description,
-                    })
-               });
-*/
+               /*
+                              console.log("aca arranco la carga de pasos")
+                              req.body.data.pasos.forEach(async(elem) => {
+                                   console.log(elem)
+                                   await paso.create({
+                                        idReceta: idRecetaCreado,
+                                        nroPaso: elem.stepNumber,
+                                        texto: elem.description,
+                                   })
+                              });
+               */
                console.log("aca arranco la carga de utilizados")
 
-               req.body.data.ingredientes.forEach(async(elem) => {
+               req.body.data.ingredientes.forEach(async (elem) => {
                     const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
                          raw: true,
@@ -630,6 +643,32 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      }
 });
 
+
+// Personalizacion de receta x comensal
+
+app.use('/recetapersonalizada/:idReceta', async (req, res) => {
+     try {
+          if (req.method === 'POST') {
+               const recetaBuscada = await receta.findOne({
+                    where: {
+                         idReceta: req.params.idReceta
+                    }
+               })
+               const factorConversion = req.body.data.porciones / recetaBuscada.cantidadPersonas;
+               await personalizado.create({
+                    idReceta: req.params.idReceta,
+                    idUsuario: req.params.idUsuario,
+                    factorConversion: factorConversion
+               })
+          }
+     }
+     catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
 
 
 /*   //Receta por categoria   --> A terminar
