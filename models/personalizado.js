@@ -1,6 +1,3 @@
-
-
-
 'use strict';
 const {
   Model
@@ -28,7 +25,7 @@ factorConversion: DataTypes.FLOAT
   }, {
     freezeTableName: true
 });
-paso.removeAttribute('id');
+personalizado.removeAttribute('id');
   return personalizado;
 };
 
