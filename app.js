@@ -403,20 +403,20 @@ app.use('/receta/:idReceta', async (req, res) => {
                     where: { idReceta: req.params.idReceta }
                });
 
-               const idIngredientes= await utilizado.findAll({
+               const idIngredientes = await utilizado.findAll({
                     attributes: ["idIngrediente"],
-                    where:{ idReceta: req.params.idReceta}
+                    where: { idReceta: req.params.idReceta }
                })
 
                await ingrediente.destroy({
-                    where: { idIngrediente: {[Op.in]:idIngredientes }}
+                    where: { idIngrediente: { [Op.in]: idIngredientes } }
                })
 
                await utilizado.destroy({
-                    where: { idReceta: req.params.idReceta}
+                    where: { idReceta: req.params.idReceta }
                })
                await foto.destroy({
-                    where: {idReceta: req.params.idReceta}
+                    where: { idReceta: req.params.idReceta }
                })
                const resultadosRecetas = await receta.destroy({
                     where: { idReceta: req.params.idReceta }
@@ -650,6 +650,50 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      }
 });
 
+
+app.use('/recetaPrueba', async(req,res)=>{
+     try{
+          if(req.method==='GET'){
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.idusuario=:idUsuario',{
+                         replacements:{idUsuario: req.body.idUsuario}
+                    }
+               );
+               console.log(JSON.stringify(results[0], null, 2))
+          res.status(200).json({
+               message: "Se han encontrado las siguientes recetas",
+               data: results
+          })
+          }
+          
+     }catch{
+         // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+//Consultar receta por nombre (like)
+app.use('/busquedaRecetaNombre/:nombreReceta', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const resultadosRecetasNombre = await receta.findAll({
+                    where: { nombre: { [Op.like]: req.params.nombreReceta } }
+               })
+               res.status(200).json({
+                    message: "Se han encontrado las siguientes recetas",
+                    data: resultadosRecetasNombre
+               })
+          }
+     } catch {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
 
 // Personalizacion de receta x comensal
 
