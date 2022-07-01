@@ -665,7 +665,6 @@ app.use('/recetaPrueba', async(req,res)=>{
                data: results
           })
           }
-          
      }catch{
          // console.log("Catch error", error)
           res.status(500).json({
@@ -673,6 +672,54 @@ app.use('/recetaPrueba', async(req,res)=>{
           })
      }
 });
+
+
+app.use('/recetaPorIngrediente', async(req,res)=>{
+     try{
+          if(req.method==='GET'){
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre=:nombreIngrediente',{
+                         replacements:{nombreIngrediente: req.body.nombreIngrediente}
+                    }
+               );
+               console.log(JSON.stringify(results, null, 2))
+          res.status(200).json({
+               message: "Se han encontrado las siguientes recetas para el ingrediente seleccionado",
+               data: results
+          })
+          }
+     }catch{
+         // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+app.use('/recetaSinIngrediente', async(req,res)=>{
+     try{
+          if(req.method==='GET'){
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre not in (:nombreIngrediente)',{
+                         replacements:{nombreIngrediente: req.body.nombreIngrediente}
+                    }
+               );
+               console.log(JSON.stringify(results, null, 2))
+          res.status(200).json({
+               message: "Se han encontrado las siguientes recetas que no tengan el ingrediente ",
+               data: results
+          })
+          }
+     }catch{
+         // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+
 
 
 //Consultar receta por nombre (like)
