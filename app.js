@@ -651,75 +651,72 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 });
 
 
-app.use('/busqueda2', async (req, res) => {
-     console.log("hola");
+app.use('/busqueda', async (req, res) => {
      try {
-          if (req.method === 'GET') {
-               console.log("avance un poco");
-               var Ordenamiento='';
-               if(req.body.atributoOrdenamiento==='Alfabeticamente'){
-                    Ordenamiento='recetas.nombre'
-               }if(req.body.atributoOrdenamiento==='Nuevas Primero'){
-                    Ordenamiento='recetas.idreceta desc';
-               }if(req.body.atributoOrdenamiento==='Usuario'){
-                    Ordenamiento='usuarios.nickname';
+          if (req.method === 'POST') {
+               if (req.body.atributoOrdenamiento === 'Alfabeticamente') {
+                    var Ordenamiento = ' order by recetas.nombre'
+               } if (req.body.atributoOrdenamiento === 'Nuevas Primero') {
+                    var Ordenamiento = ' order by recetas.idreceta desc';
+               } if (req.body.atributoOrdenamiento === 'Usuario') {
+                    var Ordenamiento = ' order by usuarios.nickname';
                }
-               console.log(Ordenamiento);
                //Busqueda de receta por usuario
                if (req.body.atributoBusqueda === 'Usuario') {
-                    console.log("entre al de usuario");
+                    var filtro = "'"+req.body.nombreUsuario+"'"
+                    var query = "SELECT distinct recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where usuarios.nickname= " + filtro + Ordenamiento
+                    console.log(query);
                     const [results, metadata] = await sequelize.query(
-                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.idusuario=:idUsuario order by :sorting', {
-                         replacements: {idUsuario: req.body.idUsuario, sorting:Ordenamiento}//, sorting: atributoOrdenamiento}
-                    }
+                         query
                     );
                     console.log(JSON.stringify(results, null, 2))
                     res.status(200).json({
-                         message: "Se han encontrado las siguientes recetas",
+                         message: "Busqueda finalizada correctamente",
                          data: results
                     })
                }
                //Busqueda por nombre de receta
                if (req.body.atributoBusqueda === 'Receta') {
-                    console.log("entre al de receta");
+                    var filtro = "'%" + req.body.nombreReceta + "%'"
+                    var query = "SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.nombre like " +filtro+ Ordenamiento
                     const [results, metadata] = await sequelize.query(
-                         "SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.nombre like '%:nombreReceta%' order by :sorting", {
-                         replacements: { idUsuario: req.body.nombreReceta , sorting: atributoOrdenamiento }
-                    })
+                         query, {})
                     res.status(200).json({
-                         message: "Se han encontrado las siguientes recetas",
+                         message: "Busqueda finalizada correctamente",
                          data: results
                     })
                }
                //busco recetas que contengan ese ingrediente
-               if (req.body.atributoBusqueda === 'Ingrediente' && req.data.doby.atributoContiene === 'Contiene') {
+               if (req.body.atributoBusqueda === 'Ingrediente' && req.body.atributoContiene === 'Contiene') {
+                    var filtro="'"+req.body.nombreIngrediente+"'"
+                    var query='SELECT recetas.nombre, usuarios.nickname FROM adi.recetas inner join adi.utilizados on utilizados.idReceta=recetas.idReceta JOIN adi.ingredientes ON utilizados.idingrediente = ingredientes.idingrediente inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where ingredientes.nombre='+filtro+Ordenamiento
                     const [results, metadata] = await sequelize.query(
-                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre=:nombreIngrediente order by :sorting ', {
-                         replacements: { nombreIngrediente: req.body.nombreIngrediente , sorting: atributoOrdenamiento }
+                         query, {
                     }
                     );
                     console.log(JSON.stringify(results, null, 2))
                     res.status(200).json({
-                         message: "Se han encontrado las siguientes recetas para el ingrediente seleccionado",
+                         message: "Busqueda finalizada correctamente",
                          data: results
                     })
                }
                //busco recetas que NO contengan ese ingrediente
-               if (req.body.atributoBusqueda === 'Ingrediente' && req.data.doby.atributoContiene === 'No Contiene') {
+               if (req.body.atributoBusqueda === 'Ingrediente' && req.body.atributoContiene === 'No Contiene') {
+                    var filtro= "'"+req.body.nombreIngrediente+"'"
+                    var query='SELECT recetas.nombre, usuarios.nickname FROM adi.recetas inner join adi.utilizados on utilizados.idReceta=recetas.idReceta JOIN adi.ingredientes ON utilizados.idingrediente = ingredientes.idingrediente inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where ingredientes.nombre <>'+filtro+Ordenamiento
                     const [results, metadata] = await sequelize.query(
-                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre not in (:nombreIngrediente) order by :sorting ', {
-                         replacements: { nombreIngrediente: req.body.nombreIngrediente , sorting: atributoOrdenamiento }
+                         query, {    
                     }
                     );
                     console.log(JSON.stringify(results, null, 2))
                     res.status(200).json({
-                         message: "Se han encontrado las siguientes recetas que no tengan el ingrediente ",
+                         message: "Busqueda finalizada correctamente",
                          data: results
                     })
                }
           }
      } catch {
-    //      console.log("Catch error", error)
+          //      console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
