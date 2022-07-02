@@ -651,91 +651,75 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 });
 
 
-app.use('/recetaPrueba', async(req,res)=>{
-     try{
-          if(req.method==='GET'){
-               const [results, metadata] = await sequelize.query(
-                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.idusuario=:idUsuario',{
-                         replacements:{idUsuario: req.body.idUsuario}
-                    }
-               );
-               console.log(JSON.stringify(results[0], null, 2))
-          res.status(200).json({
-               message: "Se han encontrado las siguientes recetas",
-               data: results
-          })
-          }
-     }catch{
-         // console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
-          })
-     }
-});
-
-
-app.use('/recetaPorIngrediente', async(req,res)=>{
-     try{
-          if(req.method==='GET'){
-               const [results, metadata] = await sequelize.query(
-                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre=:nombreIngrediente',{
-                         replacements:{nombreIngrediente: req.body.nombreIngrediente}
-                    }
-               );
-               console.log(JSON.stringify(results, null, 2))
-          res.status(200).json({
-               message: "Se han encontrado las siguientes recetas para el ingrediente seleccionado",
-               data: results
-          })
-          }
-     }catch{
-         // console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
-          })
-     }
-});
-
-app.use('/recetaSinIngrediente', async(req,res)=>{
-     try{
-          if(req.method==='GET'){
-               const [results, metadata] = await sequelize.query(
-                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre not in (:nombreIngrediente)',{
-                         replacements:{nombreIngrediente: req.body.nombreIngrediente}
-                    }
-               );
-               console.log(JSON.stringify(results, null, 2))
-          res.status(200).json({
-               message: "Se han encontrado las siguientes recetas que no tengan el ingrediente ",
-               data: results
-          })
-          }
-     }catch{
-         // console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
-          })
-     }
-});
-
-
-
-
-
-//Consultar receta por nombre (like)
-app.use('/busquedaRecetaNombre/:nombreReceta', async (req, res) => {
+app.use('/busqueda2', async (req, res) => {
+     console.log("hola");
      try {
           if (req.method === 'GET') {
-               const resultadosRecetasNombre = await receta.findAll({
-                    where: { nombre: { [Op.like]: req.params.nombreReceta } }
-               })
-               res.status(200).json({
-                    message: "Se han encontrado las siguientes recetas",
-                    data: resultadosRecetasNombre
-               })
+               console.log("avance un poco");
+               var Ordenamiento='';
+               if(req.body.atributoOrdenamiento==='Alfabeticamente'){
+                    Ordenamiento='recetas.nombre'
+               }if(req.body.atributoOrdenamiento==='Nuevas Primero'){
+                    Ordenamiento='recetas.idreceta desc';
+               }if(req.body.atributoOrdenamiento==='Usuario'){
+                    Ordenamiento='usuarios.nickname';
+               }
+               console.log(Ordenamiento);
+               //Busqueda de receta por usuario
+               if (req.body.atributoBusqueda === 'Usuario') {
+                    console.log("entre al de usuario");
+                    const [results, metadata] = await sequelize.query(
+                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.idusuario=:idUsuario order by :sorting', {
+                         replacements: {idUsuario: req.body.idUsuario, sorting:Ordenamiento}//, sorting: atributoOrdenamiento}
+                    }
+                    );
+                    console.log(JSON.stringify(results, null, 2))
+                    res.status(200).json({
+                         message: "Se han encontrado las siguientes recetas",
+                         data: results
+                    })
+               }
+               //Busqueda por nombre de receta
+               if (req.body.atributoBusqueda === 'Receta') {
+                    console.log("entre al de receta");
+                    const [results, metadata] = await sequelize.query(
+                         "SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.nombre like '%:nombreReceta%' order by :sorting", {
+                         replacements: { idUsuario: req.body.nombreReceta , sorting: atributoOrdenamiento }
+                    })
+                    res.status(200).json({
+                         message: "Se han encontrado las siguientes recetas",
+                         data: results
+                    })
+               }
+               //busco recetas que contengan ese ingrediente
+               if (req.body.atributoBusqueda === 'Ingrediente' && req.data.doby.atributoContiene === 'Contiene') {
+                    const [results, metadata] = await sequelize.query(
+                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre=:nombreIngrediente order by :sorting ', {
+                         replacements: { nombreIngrediente: req.body.nombreIngrediente , sorting: atributoOrdenamiento }
+                    }
+                    );
+                    console.log(JSON.stringify(results, null, 2))
+                    res.status(200).json({
+                         message: "Se han encontrado las siguientes recetas para el ingrediente seleccionado",
+                         data: results
+                    })
+               }
+               //busco recetas que NO contengan ese ingrediente
+               if (req.body.atributoBusqueda === 'Ingrediente' && req.data.doby.atributoContiene === 'No Contiene') {
+                    const [results, metadata] = await sequelize.query(
+                         'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre not in (:nombreIngrediente) order by :sorting ', {
+                         replacements: { nombreIngrediente: req.body.nombreIngrediente , sorting: atributoOrdenamiento }
+                    }
+                    );
+                    console.log(JSON.stringify(results, null, 2))
+                    res.status(200).json({
+                         message: "Se han encontrado las siguientes recetas que no tengan el ingrediente ",
+                         data: results
+                    })
+               }
           }
      } catch {
-          console.log("Catch error", error)
+    //      console.log("Catch error", error)
           res.status(500).json({
                message: 'Ocurrio un error inesperado',
           })
@@ -743,7 +727,6 @@ app.use('/busquedaRecetaNombre/:nombreReceta', async (req, res) => {
 });
 
 // Personalizacion de receta x comensal
-
 app.use('/recetapersonalizada/:idReceta', async (req, res) => {
      try {
           if (req.method === 'POST') {
@@ -769,7 +752,101 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
 });
 
 
-/*   //Receta por categoria   --> A terminar
+require('./routes')(app);
+const port = process.env.PORT || 8000;
+app.set('port', port);
+const server = http.createServer(app);
+server.listen(port);
+module.exports = app;
+
+/*
+app.use('/recetaPrueba', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.idusuario=:idUsuario', {
+                    replacements: { idUsuario: req.body.idUsuario }
+               }
+               );
+               console.log(JSON.stringify(results[0], null, 2))
+               res.status(200).json({
+                    message: "Se han encontrado las siguientes recetas",
+                    data: results
+               })
+          }
+     } catch {
+          // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+app.use('/recetaPorIngrediente', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre=:nombreIngrediente', {
+                    replacements: { nombreIngrediente: req.body.nombreIngrediente }
+               }
+               );
+               console.log(JSON.stringify(results, null, 2))
+               res.status(200).json({
+                    message: "Se han encontrado las siguientes recetas para el ingrediente seleccionado",
+                    data: results
+               })
+          }
+     } catch {
+          // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+app.use('/recetaSinIngrediente', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const [results, metadata] = await sequelize.query(
+                    'SELECT recetas.nombre, usuarios.nickname FROM adi.recetas JOIN adi.ingredientes ON recetas.idreceta = ingredientes.idreceta inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where recetas.nombre not in (:nombreIngrediente)', {
+                    replacements: { nombreIngrediente: req.body.nombreIngrediente }
+               }
+               );
+               console.log(JSON.stringify(results, null, 2))
+               res.status(200).json({
+                    message: "Se han encontrado las siguientes recetas que no tengan el ingrediente ",
+                    data: results
+               })
+          }
+     } catch {
+          // console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+//Consultar receta por nombre (like)
+app.use('/busquedaRecetaNombre/:nombreReceta', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const resultadosRecetasNombre = await receta.findAll({
+                    where: { nombre: { [Op.like]: req.params.nombreReceta } }
+               })
+               res.status(200).json({
+                    message: "Se han encontrado las siguientes recetas",
+                    data: resultadosRecetasNombre
+               })
+          }
+     } catch {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+  //Receta por categoria   --> A terminar
    app.use('/receta/recetaCategoria', async (req, res) => {
         try {
              if (req.method === 'GET') {
@@ -794,12 +871,5 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
    });
 
 */
-
-require('./routes')(app);
-const port = process.env.PORT || 8000;
-app.set('port', port);
-const server = http.createServer(app);
-server.listen(port);
-module.exports = app;
 
 
