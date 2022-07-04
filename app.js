@@ -581,8 +581,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
 
                     let mediaCounter = 0;
-
-                    if(myPasos[counter].media[mediaCounter]?.base64){
+                    console.log(myPasos[counter].media[mediaCounter])
+                    if(myPasos[counter]?.media[mediaCounter]?.base64){
                          var dataURI = myPasos[counter].media[mediaCounter].base64;
                          var uploadStr = 'data:image/jpeg;base64,' + dataURI;
                          while (mediaCounter < myPasos[counter].media.length) {
