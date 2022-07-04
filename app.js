@@ -40,7 +40,7 @@ app.use(logger('dev'));
 
 
 
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(cors({ origin: '*' }));
@@ -51,7 +51,9 @@ cloudinary.config({
      api_key: '838966766312973',//process.env.CLOUDINARY_API_KEY,
      api_secret: 'JJb9sPAzENTJoYtcBDSWqwwGOWU' //process.env.CLOUDINARY_API_SECRET
 })
+const subidaImagenes = (dataURI) => {
 
+}
 app.use('/uploadImagenes3', async (req, res) => {
      try {
           if (req.method === 'POST') {
@@ -66,23 +68,18 @@ app.use('/uploadImagenes3', async (req, res) => {
                     function (error, result) {
                          res.json(result);
                     });
-                    subidaImagen.then(value => {
+               subidaImagen.then(value => {
                     const valor = value;
                     foto.create({
                          idReceta: req.params.idReceta,
                          urlFoto: valor.url,
                          extension: valor.format
                     })
-
-
-
-
-
                }).catch(err => {
                     console.log(err);
-               });          
+               });
           }
-          
+
      } catch (error) {
           console.log("Catch error", error)
           res.status(500).json({
@@ -587,43 +584,39 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
                     counter++;
                }
-               /*
-                              req.body.data.ingredientes.forEach(async(elem) => {
-                                   console.log(elem.ingrediente);
-                                   await ingrediente.create({
-                                        nombre: elem.ingrediente,
-                                   })
-                              });
-               */
-
                counter = 0;
                let myPasos = req.body.data.pasos;
                while (counter < myPasos.length) {
-                    await paso.create({
+                    let nuevoPaso = await paso.create({
                          idReceta: idRecetaCreado,
                          nroPaso: myPasos[counter].nroPaso,
                          texto: myPasos[counter].texto,
                     })
+
+                    let mediaCounter = 0;
+                    var dataURI = myPasos[counter].media[mediaCounter].base64;
+                    var uploadStr = 'data:image/jpeg;base64,' + dataURI;
+                    while (mediaCounter < myPasos[counter].media.length) {
+                         cloudinary.v2.uploader.upload(uploadStr, {
+                              overwrite: true,
+                              invalidate: true,
+                              width: 810, height: 456, crop: "fill"
+                         }).then(async value => {
+                              await multimedia.create({
+                                   idPaso: nuevoPaso.idPaso,
+                                   tipo_contenido: 'image',
+                                   extension: value.format,//traer de FOTO
+                                   urlContenido: value.url
+                              })
+                         }).catch(err => {
+                              res.status(500).json("error al subir archivo multimedia");
+                              console.log(err);
+                         });
+                    }
                     counter++;
                }
-               /*
-                              console.log("aca arranco la carga de pasos")
-                              req.body.data.pasos.forEach(async(elem) => {
-                                   console.log(elem)
-                                   await paso.create({
-                                        idReceta: idRecetaCreado,
-                                        nroPaso: elem.stepNumber,
-                                        texto: elem.description,
-                                   })
-                              });
-               */
-
-
-                              
-
 
                console.log("aca arranco la carga de utilizados")
-
                req.body.data.ingredientes.forEach(async (elem) => {
                     const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
@@ -643,7 +636,10 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
 
 
-                           //cargo foto
+                    //cargo foto
+                    var dataURI = req.body.data.foto;
+                    var uploadStr = 'data:image/jpeg;base64,' + dataURI;
+
                     console.log("aca empieza la carga de foto de cloudinary");
                     const subidaImagen = cloudinary.v2.uploader.upload(uploadStr, {
                          overwrite: true,
@@ -663,7 +659,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     }).catch(err => {
                          console.log(err);
                     });
-                    
+
 
 
 
