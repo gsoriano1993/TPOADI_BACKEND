@@ -51,9 +51,7 @@ cloudinary.config({
      api_key: '838966766312973',//process.env.CLOUDINARY_API_KEY,
      api_secret: 'JJb9sPAzENTJoYtcBDSWqwwGOWU' //process.env.CLOUDINARY_API_SECRET
 })
-const subidaImagenes = (dataURI) => {
 
-}
 app.use('/uploadImagenes3', async (req, res) => {
      try {
           if (req.method === 'POST') {
@@ -593,7 +591,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          }).then(async value => {
                               await multimedia.create({
                                    idPaso: nuevoPaso.idPaso,
-                                   tipo_contenido: 'image',
+                                   tipo_contenido: 'foto',
                                    extension: value.format,//traer de FOTO
                                    urlContenido: value.url
                               })
