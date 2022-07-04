@@ -51,9 +51,7 @@ cloudinary.config({
      api_key: '838966766312973',//process.env.CLOUDINARY_API_KEY,
      api_secret: 'JJb9sPAzENTJoYtcBDSWqwwGOWU' //process.env.CLOUDINARY_API_SECRET
 })
-const subidaImagenes = (dataURI) => {
 
-}
 app.use('/uploadImagenes3', async (req, res) => {
      try {
           if (req.method === 'POST') {
