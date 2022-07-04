@@ -19,6 +19,7 @@ const paso = require('./models').paso;
 const foto = require('./models').foto;
 const ingrediente = require('./models').ingrediente;
 const utilizado = require('./models').utilizado;
+const tipo = require('./models').tipo;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const conversion = require('./models').conversiones;
@@ -525,13 +526,31 @@ app.use('/receta/:idReceta', async (req, res) => {
      }
 });
 
+app.use('/listaCategorias', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const listadoCategorias = await tipo.findAll({
+                    raw: true
+               })
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
+                    data: listadoCategorias
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+})
+
+
 app.use('/crearReceta/:idUsuario', async (req, res) => {
      console.log("aca voy a empezar el try")
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
-
-
                const resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
@@ -541,8 +560,6 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
                })
-
-
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
                const resultadoCreacionRegistro = await receta.findAll({
@@ -582,7 +599,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 
                     let mediaCounter = 0;
                     console.log(myPasos[counter].media[mediaCounter])
-                    if(myPasos[counter]?.media[mediaCounter]?.base64){
+                    if (myPasos[counter]?.media[mediaCounter]?.base64) {
                          var dataURI = myPasos[counter].media[mediaCounter].base64;
                          var uploadStr = 'data:image/jpeg;base64,' + dataURI;
                          while (mediaCounter < myPasos[counter].media.length) {
