@@ -583,24 +583,27 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
 
                     let mediaCounter = 0;
-                    var dataURI = myPasos[counter].media[mediaCounter].base64;
-                    var uploadStr = 'data:image/jpeg;base64,' + dataURI;
-                    while (mediaCounter < myPasos[counter].media.length) {
-                         cloudinary.v2.uploader.upload(uploadStr, {
-                              overwrite: true,
-                              invalidate: true,
-                              width: 810, height: 456, crop: "fill"
-                         }).then(async value => {
-                              await multimedia.create({
-                                   idPaso: nuevoPaso.idPaso,
-                                   tipo_contenido: 'image',
-                                   extension: value.format,//traer de FOTO
-                                   urlContenido: value.url
-                              })
-                         }).catch(err => {
-                              res.status(500).json("error al subir archivo multimedia");
-                              console.log(err);
-                         });
+
+                    if(myPasos[counter].media[mediaCounter]?.base64){
+                         var dataURI = myPasos[counter].media[mediaCounter].base64;
+                         var uploadStr = 'data:image/jpeg;base64,' + dataURI;
+                         while (mediaCounter < myPasos[counter].media.length) {
+                              cloudinary.v2.uploader.upload(uploadStr, {
+                                   overwrite: true,
+                                   invalidate: true,
+                                   width: 810, height: 456, crop: "fill"
+                              }).then(async value => {
+                                   await multimedia.create({
+                                        idPaso: nuevoPaso.idPaso,
+                                        tipo_contenido: 'image',
+                                        extension: value.format,//traer de FOTO
+                                        urlContenido: value.url
+                                   })
+                              }).catch(err => {
+                                   res.status(500).json("error al subir archivo multimedia");
+                                   console.log(err);
+                              });
+                         }
                     }
                     counter++;
                }
