@@ -466,17 +466,6 @@ app.use('/receta/:idReceta', async (req, res) => {
                          idReceta: req.params.idReceta
                     }
                })
-
-               /*const [results, metadata] = await sequelize.query(
-                    "SELECT recetas.*, pasos.*, ingredientes.*, utilizados.* FROM adi.recetas JOIN adi.utilizados ON recetas.idreceta = utilizados.idreceta join adi.ingredientes on ingredientes.idingrediente= utilizados.idingrediente join adi.pasos on pasos.idreceta=recetas.idreceta"
-               );
-               var resultadosCategoria = results;
-               console.log(resultadosCategoria);
-               var resultadoFiltrado=resultadosCategoria.filter(elem=>elem.idReceta===req.params.idReceta)
-               console.log("ahora muestro filtrado");
-               console.log(resultadoFiltrado)*/
-               // Agregar logica que trae los ingredientes, pasos, unidades, etc 
-
                let ingredientesUtilizados = await utilizado.findAll({
                     where: {
                          idReceta: req.params.idReceta
@@ -615,7 +604,6 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     }
                     counter++;
                }
-
                console.log("aca arranco la carga de utilizados")
                req.body.data.ingredientes.forEach(async (elem) => {
                     const resultadoIngrediente = await ingrediente.findAll({
