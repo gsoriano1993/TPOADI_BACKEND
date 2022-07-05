@@ -20,6 +20,7 @@ const foto = require('./models').foto;
 const ingrediente = require('./models').ingrediente;
 const utilizado = require('./models').utilizado;
 const tipo = require('./models').tipo;
+const unidad = require('./models').unidad;
 const bcrypt = require('bcryptjs');
 const usuario = require('./models').usuario;
 const conversion = require('./models').conversiones;
@@ -552,7 +553,7 @@ app.use('/listaCategorias', async (req, res) => {
 app.use('/listaUnidades', async (req, res) => {
      try {
           if (req.method === 'GET') {
-               const listadoUnidades = await unidades.findAll({
+               const listadoUnidades = await unidad.findAll({
                     raw: true
                })
                res.status(200).json({
