@@ -545,15 +545,15 @@ app.use('/listaCategorias', async (req, res) => {
      }
 });
 
-app.use('/listaIngredientes', async (req, res) => {
+app.use('/listaUnidades', async (req, res) => {
      try {
           if (req.method === 'GET') {
-               const listadoIngredientes = await unidades.findAll({
+               const listadoUnidades = await unidades.findAll({
                     raw: true
                })
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
-                    data: listadoIngredientes
+                    data: listadoUnidades
                })
           }
      } catch (error) {
