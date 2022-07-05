@@ -53,7 +53,7 @@ cloudinary.config({
      api_secret: 'JJb9sPAzENTJoYtcBDSWqwwGOWU' //process.env.CLOUDINARY_API_SECRET
 })
 
-app.use('/uploadImagenes3', async (req, res) => {
+app.use('/uploadImagen', async (req, res) => {
      try {
           if (req.method === 'POST') {
                var dataURI = req.body.dataURI;
@@ -69,8 +69,12 @@ app.use('/uploadImagenes3', async (req, res) => {
                     });
                subidaImagen.then(value => {
                     const valor = value;
-                    foto.create({
+                    /*foto.create({
                          idReceta: req.params.idReceta,
+                         urlFoto: valor.url,
+                         extension: valor.format
+                    })*/
+                    res.status(200).json({
                          urlFoto: valor.url,
                          extension: valor.format
                     })
@@ -574,7 +578,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
                     descripcion: req.body.data.descripcion,
-                    foto: req.body.data.foto,
+                    foto: req.body.data.foto.urlFoto,
                     porciones: req.body.data.porciones,
                     cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
@@ -592,6 +596,11 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
 
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
+               await foto.create({
+                    idReceta: idRecetaCreado,
+                    urlFoto: req.body.data.foto.urlFoto,
+                    extension: req.body.data.foto.extension
+               })
 
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
@@ -600,6 +609,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 
                let counter = 0;
                let myIngredients = req.body.data.ingredientes;
+               let ingredientIDs = [];
                while (counter < myIngredients.length) {
                    let ingredienteExistente= await ingrediente.findOne({
                               attributes: ["idIngrediente"],
@@ -609,14 +619,17 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                               raw:true
                     });
                     if(Object.keys(ingredienteExistente).length === 0 ){
-
-                         await ingrediente.create({
+                         let newIngred = await ingrediente.create({
                               nombre: myIngredients[counter].ingrediente
                          })
-                         
+                         ingredientIDs.push(newIngred.idIngrediente);
+                    }
+                    else{
+                         ingredientIDs.push(ingredienteExistente.idIngrediente)
                     }
                     counter++;
                }
+
                counter = 0;
                let myPasos = req.body.data.pasos;
                while (counter < myPasos.length) {
@@ -626,49 +639,41 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          texto: myPasos[counter].texto,
                     })
                     let mediaCounter = 0;
-                    console.log(myPasos[counter].media[mediaCounter])
-                    if (myPasos[counter]?.media[mediaCounter]?.base64) {
-                         var dataURI = myPasos[counter].media[mediaCounter].base64;
-                         var uploadStr = 'data:image/jpeg;base64,' + dataURI;
-                         while (mediaCounter < myPasos[counter].media.length) {
-                              cloudinary.v2.uploader.upload(uploadStr, {
-                                   overwrite: true,
-                                   invalidate: true,
-                                   width: 810, height: 456, crop: "fill"
-                              }).then(async value => {
-                                   await multimedia.create({
-                                        idPaso: nuevoPaso.idPaso,
-                                        tipo_contenido: 'image',
-                                        extension: value.format,//traer de FOTO
-                                        urlContenido: value.url
-                                   })
-                              }).catch(err => {
-                                   res.status(500).json("error al subir archivo multimedia");
-                                   console.log(err);
-                              });
-                         }
+                    while(mediaCounter < myPasos[counter].media.length){
+                         console.log(myPasos[counter].media[mediaCounter])
+                         await multimedia.create({
+                              idPaso: nuevoPaso.idPaso,
+                              tipo_contenido: 'image',
+                              extension: myPasos[counter].media[mediaCounter].extension, //traer de FOTO
+                              urlContenido: myPasos[counter].media[mediaCounter].urlFoto
+                         })
+                         mediaCounter += 1;
                     }
                     counter++;
                }
                console.log("aca arranco la carga de utilizados")
-               req.body.data.ingredientes.forEach(async (elem) => {
-                    const resultadoIngrediente = await ingrediente.findAll({
+               counter = 0;
+               while(counter < req.body.data.ingredientes.length){
+                    let elem = req.body.data.ingredientes[counter];
+                    let currentId = ingredientIDs[counter];
+                    /*const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
                          raw: true,
                          limit: 1,
                          where: {
-                              nombre: elem.ingrediente
+                              idIngrediente: currentId
                          }
                     })
-                    console.log(resultadoIngrediente[0])
+                    console.log(resultadoIngrediente[0])*/
                     await utilizado.create({
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
-                         idIngrediente: resultadoIngrediente[0].idIngrediente.toString(),
+                         idIngrediente: currentId.toString(),
                          idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: '',
                     })
-               });
+                    counter += 1;
+               }
                res.status(200).json({
                     message: "Receta creada correctamente",
                     data: idRecetaCreado
