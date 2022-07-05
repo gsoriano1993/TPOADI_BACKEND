@@ -601,10 +601,20 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                let counter = 0;
                let myIngredients = req.body.data.ingredientes;
                while (counter < myIngredients.length) {
-                    await ingrediente.create({
-                         nombre: myIngredients[counter].ingrediente,
+                   let ingredienteExistente= await ingrediente.findOne({
+                              attributes: ["idIngrediente"],
+                              nombre: {
+                                [Op.iLike]: myIngredients[counter].ingrediente //con el iLike no es case sensitive
+                              } ,
+                              raw:true
+                    });
+                    if(Object.keys(ingredienteExistente).length === 0 ){
 
-                    })
+                         await ingrediente.create({
+                              nombre: myIngredients[counter].ingrediente
+                         })
+                         
+                    }
                     counter++;
                }
                counter = 0;
