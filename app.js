@@ -575,8 +575,9 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
+               const resultadosCreacion=[];
           if(req.body.data.foto==null){
-               const resultadosCreacion = await receta.create({
+                resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
                     descripcion: req.body.data.descripcion,
@@ -586,7 +587,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     idTipo: req.body.data.idTipo
                })
           }else{
-               const resultadosCreacion = await receta.create({
+                resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
                     descripcion: req.body.data.descripcion,
