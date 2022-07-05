@@ -575,6 +575,17 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
+               if(req.body.data.foto.urlFoto.length===0){
+               const resultadosCreacion = await receta.create({
+                    idUsuario: req.params.idUsuario,
+                    nombre: req.body.data.nombre,
+                    descripcion: req.body.data.descripcion,
+                    foto: null,
+                    porciones: req.body.data.porciones,
+                    cantidadPersonas: req.body.data.porciones,
+                    idTipo: req.body.data.idTipo
+               })
+          }else{
                const resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
@@ -584,6 +595,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     cantidadPersonas: req.body.data.porciones,
                     idTipo: req.body.data.idTipo
                })
+          }
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
                const resultadoCreacionRegistro = await receta.findAll({
