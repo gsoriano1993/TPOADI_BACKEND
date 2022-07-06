@@ -653,18 +653,31 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                while (counter < myIngredients.length) {
                    let ingredienteExistente= await ingrediente.findOne({
                               attributes: ["idIngrediente"],
-                              nombre: {
-                                [Op.iLike]: myIngredients[counter].ingrediente //con el iLike no es case sensitive
-                              } ,
-                              raw:true
+                              raw:true,
+                              where: {
+                                   nombre: {
+                                        [Op.iLike]: myIngredients[counter].ingrediente //con el iLike no es case sensitive
+                                   } ,
+                              }
                     });
                     console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
                     console.log("Ingrediente Existente: " + ingredienteExistente)
                     if(!ingredienteExistente){
                          let newIngred = await ingrediente.create({
-                              nombre: myIngredients[counter].ingrediente
+                              where: {
+                                   nombre: myIngredients[counter].ingrediente
+                              }
                          })
-                         ingredientIDs.push(newIngred.idIngrediente);
+                         let createdIng = await ingrediente.findAll({
+                              attributes: ["idIngrediente"],
+                              raw: true,
+                              limit: 1,
+                              order: [['idIngrediente', 'DESC']],
+                              where: {
+                                   nombre: myIngredients[counter].ingrediente
+                              }
+                         })
+                         ingredientIDs.push(createdIng.idIngrediente);
                     }
                     else{
                          ingredientIDs.push(ingredienteExistente.idIngrediente)
