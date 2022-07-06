@@ -424,6 +424,16 @@ app.use('/receta/:idReceta', async (req, res) => {
                await paso.destroy({
                     where: { idReceta: req.params.idReceta }
                });
+               
+               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ="+req.params.idReceta+")"
+               const [results, metadata] = await sequelize.query(
+                    query
+               );
+
+                query= "delete from adi.pasos where idreceta="+req.params.idReceta
+                const [results2, metadata2] = await sequelize.query(
+                    query
+               );
 
                const idIngredientes = await utilizado.findAll({
                     attributes: ["idIngrediente"],
@@ -577,7 +587,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
           if (req.method === 'POST') {
                console.log("carga de receta")
                let resultadosCreacion=[];
-          if(req.body.data.foto==null){
+          if(req.body.data.foto==null){ //ver aca si esta bien el if para cuando no cargan foto en la receta
                 resultadosCreacion = await receta.create({
                     idUsuario: req.params.idUsuario,
                     nombre: req.body.data.nombre,
