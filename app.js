@@ -621,11 +621,13 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
 
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
-               await foto.create({
-                    idReceta: idRecetaCreado,
-                    urlFoto: req.body.data.foto.urlFoto,
-                    extension: req.body.data.foto.extension
-               })
+               if(req.body.data.foto != null){
+                    await foto.create({
+                         idReceta: idRecetaCreado,
+                         urlFoto: req.body.data.foto.urlFoto,
+                         extension: req.body.data.foto.extension
+                    })
+               }
 
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
