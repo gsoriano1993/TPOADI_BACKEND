@@ -673,11 +673,16 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                                    nombre: myIngredients[counter].ingrediente
                               }
                          })
+                         console.log("createdIng",createdIng);
+
                          ingredientIDs.push(createdIng[0].idIngrediente);
                     }
                     else{
+                         console.log("Existing id",ingredienteExistente);
+
                          ingredientIDs.push(ingredienteExistente[0].idIngrediente)
                     }
+                    console.log("Existing id",ingredientIDs);
                     counter = counter + 1;
                }
 
