@@ -505,9 +505,9 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
 
                const dataPasos = await paso.findAll({
+                    attributes: ['idPaso','idReceta', 'texto','nroPaso'],
+                    raw: true,
                     where: {
-                         attributes: ['idPaso','idReceta', 'texto','nroPaso'],
-                         raw: true,
                          idReceta: req.params.idReceta
                     }
                })
@@ -516,9 +516,9 @@ app.use('/receta/:idReceta', async (req, res) => {
                let pasosFinal = [...dataPasos];
                while(counter < dataPasos.length){
                     let media = await multimedia.findAll({
+                         attributes: ['extension', 'idPaso','tipo_contenido','urlContenido'],
+                         raw: true,
                          where: {
-                              attributes: ['extension', 'idPaso','tipo_contenido','urlContenido'],
-                              raw: true,
                               idPaso: dataPasos[counter].idPaso
                          }
                     })
