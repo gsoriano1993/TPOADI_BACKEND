@@ -660,9 +660,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     console.log("Ingrediente Existente: ", ingredienteExistente)
                     if(ingredienteExistente.length == 0){
                          await ingrediente.create({
-                              where: {
-                                   nombre: myIngredients[counter].ingrediente
-                              }
+                              nombre: myIngredients[counter].ingrediente
                          })
                          let createdIng = await ingrediente.findAll({
                               attributes: ["idIngrediente"],
