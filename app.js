@@ -633,7 +633,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
 
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
-               if(req.body.data.foto==null){
+               if(req.body.data.foto != null){
                     await foto.create({
                          idReceta: idRecetaCreado,
                          urlFoto: req.body.data.foto.urlFoto,
