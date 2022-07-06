@@ -682,12 +682,22 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          texto: myPasos[counter].texto,
                     })
                     console.log("Paso creado: ", nuevoPaso)
+                    const pasoCreado = await paso.findAll({
+                         attributes: ["idPaso"],
+                         raw: true,
+                         limit: 1,
+                         where: {
+                              idReceta: idRecetaCreado
+                         },
+                         order: [['idPaso', 'DESC']]
+                    })
+                    console.log("Paso creado obtenido", pasoCreado);
                     let mediaCounter = 0;
                     while(mediaCounter < myPasos[counter].media.length){
                          console.log("Media numero: " + mediaCounter + " / " + myPasos[counter].media.length);
                          console.log("Elemento: ", myPasos[counter].media[mediaCounter])
                          let nuevaMultimedia = await multimedia.create({
-                              idPaso: nuevoPaso.idPaso,
+                              idPaso: pasoCreado[0].idPaso,
                               tipo_contenido: 'image',
                               extension: myPasos[counter].media[mediaCounter].extension, //traer de FOTO
                               urlContenido: myPasos[counter].media[mediaCounter].urlFoto
