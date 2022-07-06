@@ -593,6 +593,27 @@ app.use('/listaUnidades', async (req, res) => {
      }
 });
 
+app.use('/listaIngredientes', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const listadoIngredientes = await ingrediente.findAll({
+                    raw: true
+               })
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
+                    data: listadoIngredientes
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+
 
 app.use('/crearReceta/:idUsuario', async (req, res) => {
      console.log("aca voy a empezar el try")
