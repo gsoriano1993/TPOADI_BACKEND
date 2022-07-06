@@ -651,19 +651,15 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                let myIngredients = req.body.data.ingredientes;
                let ingredientIDs = [];
                while (counter < myIngredients.length) {
-                   let ingredienteExistente= await ingrediente.findOne({
-                              attributes: ["idIngrediente"],
-                              raw:true,
-                              where: {
-                                   nombre: {
-                                        [Op.iLike]: myIngredients[counter].ingrediente //con el iLike no es case sensitive
-                                   } ,
-                              }
-                    });
+                    var query = "SELECT TOP 1 ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = " +  myIngredients[counter].ingrediente.toLowerCase();
+                    console.log("Query: " + query);
+                    const ingredienteExistente = await sequelize.query(
+                         query,
+                    );
                     console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
                     console.log("Ingrediente Existente: " + ingredienteExistente)
-                    if(!ingredienteExistente){
-                         let newIngred = await ingrediente.create({
+                    if(!ingredienteExistente.length > 0){
+                         await ingrediente.create({
                               where: {
                                    nombre: myIngredients[counter].ingrediente
                               }
@@ -680,7 +676,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          ingredientIDs.push(createdIng.idIngrediente);
                     }
                     else{
-                         ingredientIDs.push(ingredienteExistente.idIngrediente)
+                         ingredientIDs.push(ingredienteExistente[0].idIngrediente)
                     }
                     counter = counter + 1;
                }
