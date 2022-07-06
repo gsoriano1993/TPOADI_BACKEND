@@ -13,6 +13,7 @@ const upload = require('./multer')
 const cloudinary = require('cloudinary');
 const fs = require('fs');
 const logeo = require('./models').logeo;
+const favorito = require('./models').favorito;
 const validador = require('./models').validador;
 const receta = require('./models').receta;
 const paso = require('./models').paso;
@@ -768,8 +769,6 @@ app.use('/busqueda', async (req, res) => {
                     })
                }
 
-
-
                //busco recetas que NO contengan ese ingrediente
                if (req.body.data.atributoBusqueda === 'Ingrediente' && req.body.data.atributoContiene === 'No Contiene') {
                     var filtro = "'" + req.body.data.nombreIngrediente + "'"
@@ -817,6 +816,45 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
           })
      }
 });
+
+
+app.use('/favoritos', async (req, res) => {
+     try {
+          console.log("entre al endpoint de favoritos")
+          console.log(req.body.data)
+          if (req.method === 'POST') {
+               const nuevoFavorito = await favorito.create({
+                    idReceta: req.body.data.idReceta,
+                    idUsuario: req.body.data.idUsuario
+               })
+               res.status(200).json({
+                    message: "Se agrego correctamente a favoritos",
+                    data: results
+               })
+          } 
+          if( req.method === 'GET'){
+               var filtro =  req.body.data.idUsuario
+               var ordenamiento = ') order by recetas.nombre asc'
+                    var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario =" + filtro + ordenamiento
+                    console.log(query);
+                    const [results, metadata] = await sequelize.query(
+                         query
+                    );
+                    res.status(200).json({
+                         message: "Busqueda finalizada correctamente",
+                         data: results
+                    })
+               }
+          }
+          catch (error) {
+               console.log("Catch error", error)
+               res.status(500).json({
+                    message: 'Ocurrio un error inesperado',
+               })
+          }
+});
+
+
 
 
 require('./routes')(app);
