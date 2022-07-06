@@ -651,7 +651,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                let myIngredients = req.body.data.ingredientes;
                let ingredientIDs = [];
                while (counter < myIngredients.length) {
-                    var query = "SELECT TOP 1 ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = '" +  myIngredients[counter].ingrediente.toLowerCase()+"'";
+                    var query = "SELECT TOP 1 ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = '" +  myIngredients[counter].ingrediente.toLowerCase()+"' limit 1";
                     console.log("Query: " + query);
                     const ingredienteExistente = await sequelize.query(
                          query,
