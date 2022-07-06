@@ -558,9 +558,9 @@ app.use('/receta/:idReceta', async (req, res) => {
 app.use('/listaCategorias', async (req, res) => {
      try {
           if (req.method === 'GET') {
-               const listadoCategorias = await tipo.findAll({
-                    raw: true
-               })
+               const [listadoCategorias, metadata] = await sequelize.query(
+                    "SELECT tipos.idtipo, tipos.descripcion, fotoscategorias.urlfoto FROM adi.tipos inner join adi.fotoscategorias on tipos.idtipo= fotoscategorias.id "
+               );
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
                     data: listadoCategorias
@@ -573,6 +573,9 @@ app.use('/listaCategorias', async (req, res) => {
           })
      }
 });
+
+
+
 
 app.use('/listaUnidades', async (req, res) => {
      try {
