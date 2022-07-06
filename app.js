@@ -812,7 +812,7 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
                     }
                })
                const factorConversion = req.body.data.porciones / recetaBuscada.cantidadPersonas;
-               await personalizado.create({
+               await personalizacion.create({
                     idReceta: req.params.idReceta,
                     idUsuario: req.params.idUsuario,
                     factorConversion: factorConversion
