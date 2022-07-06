@@ -513,12 +513,24 @@ app.use('/receta/:idReceta', async (req, res) => {
                     }
                })
 
+               counter = 0
+               let pasosFinal = [...dataPasos];
+               while(counter < dataPasos.length){
+                    let media = await multimedia.findAll({
+                         where: {
+                              idPaso: dataPasos[counter].idPaso
+                         }
+                    })
+                    pasosFinal[counter] = {...pasosFinal[counter], "media": [...media]}
+                    counter = counter + 1;
+               }
+
                // Objeto tentativo a devolver:
 
                let fullRecipe = {
                     ...recetaBuscada,
                     ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
-                    pasos: [...dataPasos]
+                    pasos: [...pasosFinal]
                }
 
 
@@ -621,11 +633,13 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
 
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
-               await foto.create({
-                    idReceta: idRecetaCreado,
-                    urlFoto: req.body.data.foto.urlFoto,
-                    extension: req.body.data.foto.extension
-               })
+               if(req.body.data.foto==null){
+                    await foto.create({
+                         idReceta: idRecetaCreado,
+                         urlFoto: req.body.data.foto.urlFoto,
+                         extension: req.body.data.foto.extension
+                    })
+               }
 
                console.log("aca imprimo el id de receta")
                console.log(idRecetaCreado);  //aca te devuelvo el idReceta
@@ -643,7 +657,9 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                               } ,
                               raw:true
                     });
-                    if(Object.keys(ingredienteExistente).length === 0 ){
+                    console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
+                    console.log("Ingrediente Existente: " + ingredienteExistente)
+                    if(!ingredienteExistente){
                          let newIngred = await ingrediente.create({
                               nombre: myIngredients[counter].ingrediente
                          })
@@ -652,35 +668,40 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     else{
                          ingredientIDs.push(ingredienteExistente.idIngrediente)
                     }
-                    counter++;
+                    counter = counter + 1;
                }
 
                counter = 0;
                let myPasos = req.body.data.pasos;
                while (counter < myPasos.length) {
+                    console.log("Paso: " + counter + " / " + myPasos.length)
                     let nuevoPaso = await paso.create({
                          idReceta: idRecetaCreado,
                          nroPaso: myPasos[counter].nroPaso,
                          texto: myPasos[counter].texto,
                     })
+                    console.log("Paso creado: ", nuevoPaso)
                     let mediaCounter = 0;
                     while(mediaCounter < myPasos[counter].media.length){
-                         console.log(myPasos[counter].media[mediaCounter])
-                         await multimedia.create({
+                         console.log("Media numero: " + mediaCounter + " / " + myPasos[counter].media.length);
+                         console.log("Elemento: ", myPasos[counter].media[mediaCounter])
+                         let nuevaMultimedia = await multimedia.create({
                               idPaso: nuevoPaso.idPaso,
                               tipo_contenido: 'image',
                               extension: myPasos[counter].media[mediaCounter].extension, //traer de FOTO
                               urlContenido: myPasos[counter].media[mediaCounter].urlFoto
                          })
+                         console.log("Nueva multimedia: ", nuevaMultimedia)
                          mediaCounter += 1;
                     }
                     counter++;
                }
                console.log("aca arranco la carga de utilizados")
                counter = 0;
-               while(counter < req.body.data.ingredientes.length){
-                    let elem = req.body.data.ingredientes[counter];
+               while(counter < myIngredients.length){
+                    let elem = myIngredients[counter];
                     let currentId = ingredientIDs[counter];
+                    console.log("Creacion utilizado: " + counter + " / " + myIngredients.length)
                     /*const resultadoIngrediente = await ingrediente.findAll({
                          attributes: ["idIngrediente"],
                          raw: true,
@@ -690,14 +711,15 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          }
                     })
                     console.log(resultadoIngrediente[0])*/
-                    await utilizado.create({
+                    let utilizadoCreado = await utilizado.create({
                          cantidad: elem.cantidad,
                          idReceta: idRecetaCreado,
                          idIngrediente: currentId.toString(),
                          idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: '',
                     })
-                    counter += 1;
+                    console.log("Creado: " , utilizadoCreado)
+                    counter = counter + 1;
                }
                res.status(200).json({
                     message: "Receta creada correctamente",
