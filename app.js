@@ -65,10 +65,7 @@ app.use('/uploadImagen', async (req, res) => {
                     overwrite: true,
                     invalidate: true,
                     width: 810, height: 456, crop: "fill"
-               },
-                    function (error, result) {
-                         res.json(result);
-                    });
+               });
                subidaImagen.then(value => {
                     const valor = value;
                     /*foto.create({
@@ -509,6 +506,8 @@ app.use('/receta/:idReceta', async (req, res) => {
 
                const dataPasos = await paso.findAll({
                     where: {
+                         attributes: ['idPaso','idReceta', 'texto','nroPaso'],
+                         raw: true,
                          idReceta: req.params.idReceta
                     }
                })
@@ -518,6 +517,8 @@ app.use('/receta/:idReceta', async (req, res) => {
                while(counter < dataPasos.length){
                     let media = await multimedia.findAll({
                          where: {
+                              attributes: ['extension', 'idPaso','tipo_contenido','urlContenido'],
+                              raw: true,
                               idPaso: dataPasos[counter].idPaso
                          }
                     })
