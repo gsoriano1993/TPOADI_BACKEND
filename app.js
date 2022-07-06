@@ -657,8 +657,8 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          query,
                     );
                     console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
-                    console.log("Ingrediente Existente: " + ingredienteExistente)
-                    if(!ingredienteExistente.length > 0){
+                    console.log("Ingrediente Existente: ", ingredienteExistente)
+                    if(ingredienteExistente === "" || ingredienteExistente === []){
                          await ingrediente.create({
                               where: {
                                    nombre: myIngredients[counter].ingrediente
@@ -682,7 +682,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
 
                          ingredientIDs.push(ingredienteExistente[0].idIngrediente)
                     }
-                    console.log("Existing id",ingredientIDs);
+                    console.log("Final IngredientIDs",ingredientIDs);
                     counter = counter + 1;
                }
 
