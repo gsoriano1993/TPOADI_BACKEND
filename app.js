@@ -702,10 +702,14 @@ app.use('/receta/:idReceta', async (req, res) => {
                counter = counter + 1;
           }
           const userDeReceta = await usuario.findOne({
+               attributes: ["nickname"],
+               raw: true,
                where: {
                     idUsuario: recetaBuscada.idUsuario
                }
           })
+
+          console.log("userDeReceta: ", userDeReceta);
 
           // Objeto tentativo a devolver:
 
@@ -713,9 +717,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                ...recetaBuscada,
                ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
                pasos: [...pasosFinal],
-               usuario: {
-                    ...userDeReceta
-               }
+               "nickname": userDeReceta.nickname
           }
 
           if (recetaBuscada) {
