@@ -1004,7 +1004,7 @@ app.use('/busqueda', async (req, res) => {
                //Busqueda de receta por usuario
                if (req.body.data.atributoBusqueda === 'Usuario') {
                     var filtro = "'" + req.body.data.nombreUsuario + "'"
-                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario WHERE usuarios.nickname= " + filtro + Ordenamiento
+                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario WHERE usuarios.nickname= " + filtro + Ordenamiento
                     console.log(query);
                     const [results, metadata] = await sequelize.query(
                          query
@@ -1018,7 +1018,7 @@ app.use('/busqueda', async (req, res) => {
                //Busqueda por nombre de receta
                if (req.body.data.atributoBusqueda === 'Receta') {
                     var filtro = "'%" + req.body.data.nombreReceta + "%'"
-                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta FROM adi.recetas  JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.nombre like " + filtro + Ordenamiento
+                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas  JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario where recetas.nombre like " + filtro + Ordenamiento
                     const [results, metadata] = await sequelize.query(
                          query, {})
                     res.status(200).json({
@@ -1029,7 +1029,7 @@ app.use('/busqueda', async (req, res) => {
                //busco recetas que contengan ese ingrediente
                if (req.body.data.atributoBusqueda === 'Ingrediente' && req.body.data.atributoContiene === 'Contiene') {
                     var filtro = "'" + req.body.data.nombreIngrediente + "'"
-                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta FROM adi.recetas left JOIN adi.utilizados on utilizados.idReceta=recetas.idReceta left JOIN adi.ingredientes ON utilizados.idingrediente = ingredientes.idingrediente JOIN adi.usuarios on usuarios.idusuario = recetas.idusuario where ingredientes.nombre=' + filtro + Ordenamiento
+                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas left JOIN adi.utilizados on utilizados.idReceta=recetas.idReceta left JOIN adi.ingredientes ON utilizados.idingrediente = ingredientes.idingrediente JOIN adi.usuarios on usuarios.idusuario = recetas.idusuario where ingredientes.nombre=' + filtro + Ordenamiento
                     const [results, metadata] = await sequelize.query(
                          query, {
                     }
@@ -1043,7 +1043,7 @@ app.use('/busqueda', async (req, res) => {
                //busco recetas por categoria
                if (req.body.data.atributoBusqueda === 'Categoria') {
                     var filtro = "'" + req.body.data.nombreCategoria + "'"
-                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta  FROM adi.recetas inner join adi.tipos on tipos.idtipo=recetas.idtipo inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where tipos.descripcion=' + filtro + Ordenamiento
+                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto  FROM adi.recetas inner join adi.tipos on tipos.idtipo=recetas.idtipo inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where tipos.descripcion=' + filtro + Ordenamiento
                     const [results, metadata] = await sequelize.query(
                          query, {
                     }
@@ -1058,7 +1058,7 @@ app.use('/busqueda', async (req, res) => {
                //busco recetas que NO contengan ese ingrediente
                if (req.body.data.atributoBusqueda === 'Ingrediente' && req.body.data.atributoContiene === 'No Contiene') {
                     var filtro = "'" + req.body.data.nombreIngrediente + "'"
-                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta  FROM adi.recetas inner join adi.tipos on tipos.idtipo=recetas.idtipo inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where tipos.descripcion<>' + filtro + Ordenamiento
+                    var query = 'SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto  FROM adi.recetas inner join adi.tipos on tipos.idtipo=recetas.idtipo inner join adi.usuarios on usuarios.idusuario = recetas.idusuario where tipos.descripcion<>' + filtro + Ordenamiento
                     const [results, metadata] = await sequelize.query(
                          query, {
                     }
