@@ -428,13 +428,14 @@ app.use('/receta/:idReceta', async (req, res) => {
                     query
                );
 
-               const idIngredientes = await utilizado.findAll({
+               const integredientes = await utilizado.findAll({
                     attributes: ["idIngrediente"],
+                    raw: true,
                     where: { idReceta: req.params.idReceta }
                })
-
+               console.log("Ingredientes a eliminar", integredientes)
                await ingrediente.destroy({
-                    where: { idIngrediente: { [Op.in]: idIngredientes } }
+                    where: { idIngrediente: { [Op.in]: [...integredientes.map(item => item.idIngrediente)] } }
                })
 
                await utilizado.destroy({
