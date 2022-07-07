@@ -1118,23 +1118,25 @@ app.use('/favoritos', async (req, res) => {
 
 app.use('/favoritos/:idUsuario/receta/:idReceta', async (req, res) => {
      try {
-          console.log("entre al endpoint de favoritos")
           if (req.method === 'GET') {
+               console.log("Valida si es favorito")
                const validadorFavorito = await favorito.findOne({
                     where: {
                          idReceta: req.params.idReceta,
                          idUsuario: req.params.idUsuario
                     }
                })
+               console.log("Resultado de busqueda: ", validadorFavorito);
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
                     data: validadorFavorito
                })
           }
           if (req.method === 'DELETE') {
+               console.log("Eliminar favorito")
                var usuario = req.params.idUsuario
                var receta = req.params.idReceta
-               var query = "delete from adi.favoritos where favoritos.idreceta=" + receta + " and favoritos.idusuario=" + usuario
+               var query = "delete from adi.favoritos where favoritos.idreceta='" + receta + "' and favoritos.idusuario='" + usuario + "'";
                console.log(query);
                const [results, metadata] = await sequelize.query(
                     query
@@ -1155,15 +1157,16 @@ app.use('/favoritos/:idUsuario/receta/:idReceta', async (req, res) => {
 
 app.use('/favoritos/:idUsuario', async (req, res) => {
      try {
-          console.log("entre al endpoint de favoritos")
           if (req.method === 'GET') {
+               console.log("Obtener recetas favoritas para usuario: ", req.params.idUsuario);
                var filtro = req.params.idUsuario
-               var ordenamiento = ') order by recetas.nombre asc'
-               var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario =" + filtro + ordenamiento
+               var ordenamiento = "') order by recetas.nombre asc"
+               var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario ='" + filtro + ordenamiento
                console.log(query);
                const [results, metadata] = await sequelize.query(
                     query
                );
+               console.log("Resultados de busqueda de recetas personalizadas: ", results);
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
                     data: results
