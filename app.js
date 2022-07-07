@@ -701,15 +701,22 @@ app.use('/receta/:idReceta', async (req, res) => {
                pasosFinal[counter] = { ...pasosFinal[counter], "media": [...media] }
                counter = counter + 1;
           }
+          const userDeReceta = await usuario.findOne({
+               where: {
+                    idUsuario: recetaBuscada.idUsuario
+               }
+          })
 
           // Objeto tentativo a devolver:
 
           let fullRecipe = {
                ...recetaBuscada,
                ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
-               pasos: [...pasosFinal]
+               pasos: [...pasosFinal],
+               usuario: {
+                    ...userDeReceta
+               }
           }
-
 
           if (recetaBuscada) {
                res.status(200).json({
