@@ -460,96 +460,275 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
           }
           if (req.method === 'PUT') {
-               await receta.update(req.body, {
-                    where: {
-                         idReceta: req.params.idReceta,
-                    }
-               });
-               res.status(200).json({
-                    message: "Receta editada exitosamente"
-               })
-          }
-          if (req.method === 'GET') {
-               const recetaBuscada = await receta.findOne({
-                    where: {
-                         idReceta: req.params.idReceta
-                    }
-               })
-               let ingredientesUtilizados = await utilizado.findAll({
-                    where: {
-                         idReceta: req.params.idReceta
-                    }
+
+               var query = "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ='" + req.params.idReceta + "')"
+               const [results, metadata] = await sequelize.query(
+                    query
+               );
+
+               query = "delete from adi.pasos where idreceta='" + req.params.idReceta + "'";
+               const [results2, metadata2] = await sequelize.query(
+                    query
+               );
+
+               const integredientes = await utilizado.findAll({
+                    attributes: ["idIngrediente"],
+                    raw: true,
+                    where: { idReceta: req.params.idReceta }
                })
 
-               console.log("Utilizados:");
-               console.log(ingredientesUtilizados)
+               await utilizado.destroy({
+                    where: { idReceta: req.params.idReceta }
+               })
+               console.log("Ingredientes a eliminar", integredientes)
+               await ingrediente.destroy({
+                    where: { idIngrediente: { [Op.in]: [...integredientes.map(item => item.idIngrediente)] } }
+               })
+               await foto.destroy({
+                    where: { idReceta: req.params.idReceta }
+               })
+               const resultadosRecetas = await receta.destroy({
+                    where: { idReceta: req.params.idReceta }
+               });
+               console.log(`recetas eliminadas: ${resultadosRecetas}`)
+
+
+               ///////////aca cargo la receta
+
+
+               console.log("carga de receta")
+               let resultadosCreacion = [];
+               if (req.body.data.foto == null) { //ver aca si esta bien el if para cuando no cargan foto en la receta
+                    resultadosCreacion = await receta.create({
+                         idUsuario: req.params.idUsuario,
+                         nombre: req.body.data.nombre,
+                         descripcion: req.body.data.descripcion,
+                         foto: null,
+                         porciones: req.body.data.porciones,
+                         cantidadPersonas: req.body.data.porciones,
+                         idTipo: req.body.data.idTipo
+                    })
+               } else {
+                    resultadosCreacion = await receta.create({
+                         idUsuario: req.params.idUsuario,
+                         nombre: req.body.data.nombre,
+                         descripcion: req.body.data.descripcion,
+                         foto: req.body.data.foto.urlFoto,
+                         porciones: req.body.data.porciones,
+                         cantidadPersonas: req.body.data.porciones,
+                         idTipo: req.body.data.idTipo
+                    })
+               }
+               console.log(resultadosCreacion)
+               //busco la ultima receta generada por ese usuario
+               const resultadoCreacionRegistro = await receta.findAll({
+                    attributes: ["idReceta"],
+                    raw: true,
+                    limit: 1,
+                    where: {
+                         idUsuario: req.params.idUsuario
+                    },
+                    order: [['idReceta', 'DESC']]
+               })
+
+               const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
+               if (req.body.data.foto != null) {
+                    await foto.create({
+                         idReceta: idRecetaCreado,
+                         urlFoto: req.body.data.foto.urlFoto,
+                         extension: req.body.data.foto.extension
+                    })
+               }
+
+               console.log("aca imprimo el id de receta")
+               console.log(idRecetaCreado);  //aca te devuelvo el idReceta
+               console.log("aca arranco la carga de ingredientes")
+
 
                let counter = 0;
-               let ingredientsData = []
-               while (counter < ingredientesUtilizados.length) {
-                    let nombreIng = await ingrediente.findOne({
-                         where: {
-                              idIngrediente: ingredientesUtilizados[counter].idIngrediente
-                         }
-                    })
-                    if (nombreIng) {
-                         ingredientsData.push({ "cantidad": ingredientesUtilizados[counter].cantidad, "ingrediente": nombreIng.nombre, "unidad": ingredientesUtilizados[counter].idUnidad });
+               let myIngredients = req.body.data.ingredientes;
+               let ingredientIDs = [];
+               while (counter < myIngredients.length) {
+                    var query = "SELECT ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = '" + myIngredients[counter].ingrediente.toLowerCase() + "' limit 1";
+                    console.log("Query: " + query);
+                    const [ingredienteExistente, metadata] = await sequelize.query(
+                         query,
+                    );
+                    console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
+                    console.log("Ingrediente Existente: ", ingredienteExistente)
+                    if (ingredienteExistente.length == 0) {
+                         await ingrediente.create({
+                              nombre: myIngredients[counter].ingrediente
+                         })
+                         let createdIng = await ingrediente.findAll({
+                              attributes: ["idIngrediente"],
+                              raw: true,
+                              limit: 1,
+                              order: [['idIngrediente', 'DESC']],
+                              where: {
+                                   nombre: myIngredients[counter].ingrediente
+                              }
+                         })
+                         console.log("createdIng", createdIng);
+
+                         ingredientIDs.push(createdIng[0].idIngrediente);
                     }
                     else {
-                         ingredientsData.push({ ...ingredientesUtilizados[counter] });
+                         console.log("Existing id", ingredienteExistente);
+
+                         ingredientIDs.push(ingredienteExistente[0].idIngrediente)
                     }
+                    console.log("Final IngredientIDs", ingredientIDs);
                     counter = counter + 1;
                }
 
-               const dataPasos = await paso.findAll({
-                    attributes: ['idPaso', 'idReceta', 'texto', 'nroPaso'],
-                    raw: true,
-                    where: {
-                         idReceta: req.params.idReceta
-                    }
-               })
-
-               counter = 0
-               let pasosFinal = [...dataPasos];
-               while (counter < dataPasos.length) {
-                    let media = await multimedia.findAll({
-                         attributes: ['extension', 'idPaso', 'tipo_contenido', 'urlContenido'],
+               counter = 0;
+               let myPasos = req.body.data.pasos;
+               while (counter < myPasos.length) {
+                    console.log("Paso: " + counter + " / " + myPasos.length)
+                    let nuevoPaso = await paso.create({
+                         idReceta: idRecetaCreado,
+                         nroPaso: myPasos[counter].nroPaso,
+                         texto: myPasos[counter].texto,
+                    })
+                    console.log("Paso creado: ", nuevoPaso)
+                    const pasoCreado = await paso.findAll({
+                         attributes: ["idPaso"],
                          raw: true,
+                         limit: 1,
                          where: {
-                              idPaso: dataPasos[counter].idPaso
+                              idReceta: idRecetaCreado
+                         },
+                         order: [['idPaso', 'DESC']]
+                    })
+                    console.log("Paso creado obtenido", pasoCreado);
+                    let mediaCounter = 0;
+                    while (mediaCounter < myPasos[counter].media.length) {
+                         console.log("Media numero: " + mediaCounter + " / " + myPasos[counter].media.length);
+                         console.log("Elemento: ", myPasos[counter].media[mediaCounter])
+                         let nuevaMultimedia = await multimedia.create({
+                              idPaso: pasoCreado[0].idPaso,
+                              tipo_contenido: 'image',
+                              extension: myPasos[counter].media[mediaCounter].extension, //traer de FOTO
+                              urlContenido: myPasos[counter].media[mediaCounter].urlFoto
+                         })
+                         console.log("Nueva multimedia: ", nuevaMultimedia)
+                         mediaCounter += 1;
+                    }
+                    counter++;
+               }
+               console.log("aca arranco la carga de utilizados")
+               counter = 0;
+               while (counter < myIngredients.length) {
+                    let elem = myIngredients[counter];
+                    let currentId = ingredientIDs[counter];
+                    console.log("Creacion utilizado: " + counter + " / " + myIngredients.length)
+                    /*const resultadoIngrediente = await ingrediente.findAll({
+                         attributes: ["idIngrediente"],
+                         raw: true,
+                         limit: 1,
+                         where: {
+                              idIngrediente: currentId
                          }
                     })
-                    pasosFinal[counter] = { ...pasosFinal[counter], "media": [...media] }
+                    console.log(resultadoIngrediente[0])*/
+                    let utilizadoCreado = await utilizado.create({
+                         cantidad: elem.cantidad,
+                         idReceta: idRecetaCreado,
+                         idIngrediente: currentId.toString(),
+                         idUnidad: elem.unidad,  //me la pasas por el front
+                         observaciones: '',
+                    })
+                    console.log("Creado: ", utilizadoCreado)
                     counter = counter + 1;
                }
-
-               // Objeto tentativo a devolver:
-
-               let fullRecipe = {
-                    ...recetaBuscada,
-                    ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
-                    pasos: [...pasosFinal]
+               res.status(200).json({
+                    message: "Receta editada exitosamente",
+                    data: idRecetaCreado
+               })
+          }
+          ////////////////////////
+          if (req.method === 'GET') {
+          const recetaBuscada = await receta.findOne({
+               where: {
+                    idReceta: req.params.idReceta
                }
+          })
+          let ingredientesUtilizados = await utilizado.findAll({
+               where: {
+                    idReceta: req.params.idReceta
+               }
+          })
 
+          console.log("Utilizados:");
+          console.log(ingredientesUtilizados)
 
-               if (recetaBuscada) {
-                    res.status(200).json({
-                         message: "receta encontrada",
-                         data: fullRecipe
-                    });
+          let counter = 0;
+          let ingredientsData = []
+          while (counter < ingredientesUtilizados.length) {
+               let nombreIng = await ingrediente.findOne({
+                    where: {
+                         idIngrediente: ingredientesUtilizados[counter].idIngrediente
+                    }
+               })
+               if (nombreIng) {
+                    ingredientsData.push({ "cantidad": ingredientesUtilizados[counter].cantidad, "ingrediente": nombreIng.nombre, "unidad": ingredientesUtilizados[counter].idUnidad });
                }
                else {
-                    res.status(200).json({
-                         message: "receta no encontrada"
-                    });
+                    ingredientsData.push({ ...ingredientesUtilizados[counter] });
                }
+               counter = counter + 1;
           }
-     } catch (error) {
-          console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
+
+          const dataPasos = await paso.findAll({
+               attributes: ['idPaso', 'idReceta', 'texto', 'nroPaso'],
+               raw: true,
+               where: {
+                    idReceta: req.params.idReceta
+               }
           })
+
+          counter = 0
+          let pasosFinal = [...dataPasos];
+          while (counter < dataPasos.length) {
+               let media = await multimedia.findAll({
+                    attributes: ['extension', 'idPaso', 'tipo_contenido', 'urlContenido'],
+                    raw: true,
+                    where: {
+                         idPaso: dataPasos[counter].idPaso
+                    }
+               })
+               pasosFinal[counter] = { ...pasosFinal[counter], "media": [...media] }
+               counter = counter + 1;
+          }
+
+          // Objeto tentativo a devolver:
+
+          let fullRecipe = {
+               ...recetaBuscada,
+               ingredientes: [...ingredientsData], // estructura: {"cantidad" , "1", "unidad": "1",  "ingrediente" : "Leche" },
+               pasos: [...pasosFinal]
+          }
+
+
+          if (recetaBuscada) {
+               res.status(200).json({
+                    message: "receta encontrada",
+                    data: fullRecipe
+               });
+          }
+          else {
+               res.status(200).json({
+                    message: "receta no encontrada"
+               });
+          }
      }
+} catch (error) {
+     console.log("Catch error", error)
+     res.status(500).json({
+          message: 'Ocurrio un error inesperado',
+     })
+}
 });
 
 app.use('/listaCategorias', async (req, res) => {
