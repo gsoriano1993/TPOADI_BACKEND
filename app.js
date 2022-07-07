@@ -418,12 +418,12 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
 app.use('/receta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
-               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ="+req.params.idReceta+")"
+               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ='"+req.params.idReceta+"')"
                const [results, metadata] = await sequelize.query(
                     query
                );
 
-                query= "delete from adi.pasos where idreceta="+req.params.idReceta
+                query= "delete from adi.pasos where idreceta='"+req.params.idReceta+"'";
                 const [results2, metadata2] = await sequelize.query(
                     query
                );
