@@ -418,16 +418,12 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
 app.use('/receta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
-               await paso.destroy({
-                    where: { idReceta: req.params.idReceta }
-               });
-               
-               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ="+req.params.idReceta+")"
+               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ='"+req.params.idReceta+"')"
                const [results, metadata] = await sequelize.query(
                     query
                );
 
-                query= "delete from adi.pasos where idreceta="+req.params.idReceta
+                query= "delete from adi.pasos where idreceta='"+req.params.idReceta+"'";
                 const [results2, metadata2] = await sequelize.query(
                     query
                );
@@ -558,9 +554,9 @@ app.use('/receta/:idReceta', async (req, res) => {
 app.use('/listaCategorias', async (req, res) => {
      try {
           if (req.method === 'GET') {
-               const listadoCategorias = await tipo.findAll({
-                    raw: true
-               })
+               const [listadoCategorias, metadata] = await sequelize.query(
+                    "SELECT tipos.idtipo, tipos.descripcion, fotoscategorias.urlfoto FROM adi.tipos inner join adi.fotoscategorias on tipos.idtipo= fotoscategorias.id "
+               );
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
                     data: listadoCategorias
@@ -573,6 +569,9 @@ app.use('/listaCategorias', async (req, res) => {
           })
      }
 });
+
+
+
 
 app.use('/listaUnidades', async (req, res) => {
      try {
