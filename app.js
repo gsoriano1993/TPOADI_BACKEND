@@ -433,13 +433,13 @@ app.use('/receta/:idReceta', async (req, res) => {
                     raw: true,
                     where: { idReceta: req.params.idReceta }
                })
-               console.log("Ingredientes a eliminar", integredientes)
-               await ingrediente.destroy({
-                    where: { idIngrediente: { [Op.in]: [...integredientes.map(item => item.idIngrediente)] } }
-               })
 
                await utilizado.destroy({
                     where: { idReceta: req.params.idReceta }
+               })
+               console.log("Ingredientes a eliminar", integredientes)
+               await ingrediente.destroy({
+                    where: { idIngrediente: { [Op.in]: [...integredientes.map(item => item.idIngrediente)] } }
                })
                await foto.destroy({
                     where: { idReceta: req.params.idReceta }
