@@ -1119,7 +1119,6 @@ app.use('/favoritos', async (req, res) => {
 app.use('/favoritos/:idUsuario/receta/:idReceta', async (req, res) => {
      try {
           console.log("entre al endpoint de favoritos")
-          console.log(req.body.data)
           if (req.method === 'GET') {
                const validadorFavorito = await favorito.findOne({
                     where: {
@@ -1157,7 +1156,6 @@ app.use('/favoritos/:idUsuario/receta/:idReceta', async (req, res) => {
 app.use('/favoritos/:idUsuario', async (req, res) => {
      try {
           console.log("entre al endpoint de favoritos")
-          console.log(req.body.data)
           if (req.method === 'GET') {
                var filtro = req.params.idUsuario
                var ordenamiento = ') order by recetas.nombre asc'
