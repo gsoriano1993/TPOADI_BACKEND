@@ -1093,47 +1093,10 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
      }
 });
 
-
-app.use('/validarfavorito', async (req, res) => {
-     try {
-          if (req.method === 'GET') {
-               const validadorFavorito = await favorito.findOne({
-                    where: {
-                         idReceta: req.body.data.idReceta,
-                         idUsuario: req.body.data.idUsuario
-                    } //si validadorFavorito viene vacio, es porque no esta agregado como favorito, entonces podes hacer el POST
-               })
-               res.status(200).json({
-                    message: "Busqueda finalizada correctamente",
-                    data: validadorFavorito
-               })
-          }
-     } catch (error) {
-          console.log("Catch error", error)
-          res.status(500).json({
-               message: 'Ocurrio un error inesperado',
-          })
-     }
-})
-
-
-
 app.use('/favoritos', async (req, res) => {
      try {
           console.log("entre al endpoint de favoritos")
           console.log(req.body.data)
-          if (req.method === 'DELETE') {
-               var usuario = req.body.data.idUsuario
-               var receta = req.body.data.idReceta
-               var query = "delete from adi.favoritos where favoritos.idreceta=" + receta + " and favoritos.idusuario=" + usuario
-               console.log(query);
-               const [results, metadata] = await sequelize.query(
-                    query
-               );
-               res.status(200).json({
-                    message: "Se elimino correctamente de favoritos"
-               })
-          }
           if (req.method === 'POST') {
                const nuevoFavorito = await favorito.create({
                     idReceta: req.body.data.idReceta,
@@ -1144,8 +1107,59 @@ app.use('/favoritos', async (req, res) => {
                     data: nuevoFavorito
                })
           }
+     }
+     catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+app.use('/favoritos/:idUsuario/receta/:idReceta', async (req, res) => {
+     try {
+          console.log("entre al endpoint de favoritos")
+          console.log(req.body.data)
           if (req.method === 'GET') {
-               var filtro = req.body.data.idUsuario
+               const validadorFavorito = await favorito.findOne({
+                    where: {
+                         idReceta: req.params.idReceta,
+                         idUsuario: req.params.idUsuario
+                    }
+               })
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
+                    data: validadorFavorito
+               })
+          }
+          if (req.method === 'DELETE') {
+               var usuario = req.params.idUsuario
+               var receta = req.params.idReceta
+               var query = "delete from adi.favoritos where favoritos.idreceta=" + receta + " and favoritos.idusuario=" + usuario
+               console.log(query);
+               const [results, metadata] = await sequelize.query(
+                    query
+               );
+               res.status(200).json({
+                    message: "Se elimino correctamente de favoritos"
+               })
+          }
+     }
+     catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
+
+app.use('/favoritos/:idUsuario', async (req, res) => {
+     try {
+          console.log("entre al endpoint de favoritos")
+          console.log(req.body.data)
+          if (req.method === 'GET') {
+               var filtro = req.params.idUsuario
                var ordenamiento = ') order by recetas.nombre asc'
                var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario =" + filtro + ordenamiento
                console.log(query);
