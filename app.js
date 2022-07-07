@@ -922,7 +922,7 @@ app.use('/validarfavorito', async (req, res) => {
                     where: {
                          idReceta: req.body.data.idReceta,
                          idUsuario: req.body.data.idUsuario
-                    }
+                    } //si validadorFavorito viene vacio, es porque no esta agregado como favorito, entonces podes hacer el POST
                })
                res.status(200).json({
                     message: "Busqueda finalizada correctamente",
@@ -952,8 +952,7 @@ app.use('/favoritos', async (req, res) => {
                     query
                );
                res.status(200).json({
-                    message: "Se agrego correctamente a favoritos",
-                    data: results
+                    message: "Se elimino correctamente de favoritos"
                })
           }
           if (req.method === 'POST') {
