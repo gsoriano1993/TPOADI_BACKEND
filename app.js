@@ -1004,7 +1004,7 @@ app.use('/busqueda', async (req, res) => {
                //Busqueda de receta por usuario
                if (req.body.data.atributoBusqueda === 'Usuario') {
                     var filtro = "'" + req.body.data.nombreUsuario + "'"
-                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario WHERE usuarios.nickname= " + filtro + Ordenamiento
+                    var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario WHERE trim(usuarios.nickname)= " + filtro + Ordenamiento
                     console.log(query);
                     const [results, metadata] = await sequelize.query(
                          query,{}
