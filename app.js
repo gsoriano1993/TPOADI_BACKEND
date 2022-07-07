@@ -1093,9 +1093,9 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
      }
 });
 
-app.use('/favoritos', async (req, res) => {
+app.use('/favoritos/nuevo', async (req, res) => {
      try {
-          console.log("entre al endpoint de favoritos")
+          console.log("entra a la creacion de favoritos")
           console.log(req.body.data)
           if (req.method === 'POST') {
                const nuevoFavorito = await favorito.create({
