@@ -617,7 +617,7 @@ app.use('/obtenerRecetasNuevas', async (req, res) => {
      try {
           if (req.method === 'GET') {
                var Ordenamiento = ' order by recetas.idreceta desc';
-               var query = "SELECT distinct usuarios.nickname, usuarios.idusuario, recetas.*,  multimedia.urlcontenido FROM adi.recetas  JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario  JOIN adi.pasos on pasos.idreceta=recetas.idreceta JOIN adi.multimedia on multimedia.idpaso=pasos.idpaso join adi.tipos on recetas.idtipo=tipos.idtipo " + Ordenamiento
+               var query = "SELECT distinct usuarios.nickname, usuarios.idusuario,  multimedia.urlcontenido , recetas.* FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario left   JOIN adi.pasos on pasos.idreceta=recetas.idreceta  left JOIN adi.multimedia on multimedia.idpaso=pasos.idpaso  left join adi.tipos on recetas.idtipo=tipos.idtipo " + Ordenamiento
                const [results, metadata] = await sequelize.query(
                     query, {})
                res.status(200).json({
