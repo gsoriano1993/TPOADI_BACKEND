@@ -418,13 +418,13 @@ app.use('/recetabyuser/:idUsuario', async (req, res) => {
 app.use('/receta/:idReceta', async (req, res) => {
      try {
           if (req.method === 'DELETE') {
-               var query= "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ='"+req.params.idReceta+"')"
+               var query = "delete from adi.multimedia where idpaso in (select idpaso from adi.pasos where pasos.idreceta ='" + req.params.idReceta + "')"
                const [results, metadata] = await sequelize.query(
                     query
                );
 
-                query= "delete from adi.pasos where idreceta='"+req.params.idReceta+"'";
-                const [results2, metadata2] = await sequelize.query(
+               query = "delete from adi.pasos where idreceta='" + req.params.idReceta + "'";
+               const [results2, metadata2] = await sequelize.query(
                     query
                );
 
@@ -502,7 +502,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                }
 
                const dataPasos = await paso.findAll({
-                    attributes: ['idPaso','idReceta', 'texto','nroPaso'],
+                    attributes: ['idPaso', 'idReceta', 'texto', 'nroPaso'],
                     raw: true,
                     where: {
                          idReceta: req.params.idReceta
@@ -511,15 +511,15 @@ app.use('/receta/:idReceta', async (req, res) => {
 
                counter = 0
                let pasosFinal = [...dataPasos];
-               while(counter < dataPasos.length){
+               while (counter < dataPasos.length) {
                     let media = await multimedia.findAll({
-                         attributes: ['extension', 'idPaso','tipo_contenido','urlContenido'],
+                         attributes: ['extension', 'idPaso', 'tipo_contenido', 'urlContenido'],
                          raw: true,
                          where: {
                               idPaso: dataPasos[counter].idPaso
                          }
                     })
-                    pasosFinal[counter] = {...pasosFinal[counter], "media": [...media]}
+                    pasosFinal[counter] = { ...pasosFinal[counter], "media": [...media] }
                     counter = counter + 1;
                }
 
@@ -641,28 +641,28 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
      try {
           if (req.method === 'POST') {
                console.log("carga de receta")
-               let resultadosCreacion=[];
-          if(req.body.data.foto==null){ //ver aca si esta bien el if para cuando no cargan foto en la receta
-                resultadosCreacion = await receta.create({
-                    idUsuario: req.params.idUsuario,
-                    nombre: req.body.data.nombre,
-                    descripcion: req.body.data.descripcion,
-                    foto: null,
-                    porciones: req.body.data.porciones,
-                    cantidadPersonas: req.body.data.porciones,
-                    idTipo: req.body.data.idTipo
-               })
-          }else{
-                resultadosCreacion = await receta.create({
-                    idUsuario: req.params.idUsuario,
-                    nombre: req.body.data.nombre,
-                    descripcion: req.body.data.descripcion,
-                    foto: req.body.data.foto.urlFoto,
-                    porciones: req.body.data.porciones,
-                    cantidadPersonas: req.body.data.porciones,
-                    idTipo: req.body.data.idTipo
-               })
-          }
+               let resultadosCreacion = [];
+               if (req.body.data.foto == null) { //ver aca si esta bien el if para cuando no cargan foto en la receta
+                    resultadosCreacion = await receta.create({
+                         idUsuario: req.params.idUsuario,
+                         nombre: req.body.data.nombre,
+                         descripcion: req.body.data.descripcion,
+                         foto: null,
+                         porciones: req.body.data.porciones,
+                         cantidadPersonas: req.body.data.porciones,
+                         idTipo: req.body.data.idTipo
+                    })
+               } else {
+                    resultadosCreacion = await receta.create({
+                         idUsuario: req.params.idUsuario,
+                         nombre: req.body.data.nombre,
+                         descripcion: req.body.data.descripcion,
+                         foto: req.body.data.foto.urlFoto,
+                         porciones: req.body.data.porciones,
+                         cantidadPersonas: req.body.data.porciones,
+                         idTipo: req.body.data.idTipo
+                    })
+               }
                console.log(resultadosCreacion)
                //busco la ultima receta generada por ese usuario
                const resultadoCreacionRegistro = await receta.findAll({
@@ -676,7 +676,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                })
 
                const idRecetaCreado = resultadoCreacionRegistro[0].idReceta.toString();
-               if(req.body.data.foto != null){
+               if (req.body.data.foto != null) {
                     await foto.create({
                          idReceta: idRecetaCreado,
                          urlFoto: req.body.data.foto.urlFoto,
@@ -693,14 +693,14 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                let myIngredients = req.body.data.ingredientes;
                let ingredientIDs = [];
                while (counter < myIngredients.length) {
-                    var query = "SELECT ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = '" +  myIngredients[counter].ingrediente.toLowerCase()+"' limit 1";
+                    var query = "SELECT ingredientes.idIngrediente FROM adi.ingredientes where LOWER(ingredientes.nombre) = '" + myIngredients[counter].ingrediente.toLowerCase() + "' limit 1";
                     console.log("Query: " + query);
-                    const  [ingredienteExistente, metadata] = await sequelize.query(
+                    const [ingredienteExistente, metadata] = await sequelize.query(
                          query,
                     );
                     console.log("Creacion de ingredientes: " + counter + " / " + myIngredients.length);
                     console.log("Ingrediente Existente: ", ingredienteExistente)
-                    if(ingredienteExistente.length == 0){
+                    if (ingredienteExistente.length == 0) {
                          await ingrediente.create({
                               nombre: myIngredients[counter].ingrediente
                          })
@@ -713,16 +713,16 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                                    nombre: myIngredients[counter].ingrediente
                               }
                          })
-                         console.log("createdIng",createdIng);
+                         console.log("createdIng", createdIng);
 
                          ingredientIDs.push(createdIng[0].idIngrediente);
                     }
-                    else{
-                         console.log("Existing id",ingredienteExistente);
+                    else {
+                         console.log("Existing id", ingredienteExistente);
 
                          ingredientIDs.push(ingredienteExistente[0].idIngrediente)
                     }
-                    console.log("Final IngredientIDs",ingredientIDs);
+                    console.log("Final IngredientIDs", ingredientIDs);
                     counter = counter + 1;
                }
 
@@ -747,7 +747,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                     })
                     console.log("Paso creado obtenido", pasoCreado);
                     let mediaCounter = 0;
-                    while(mediaCounter < myPasos[counter].media.length){
+                    while (mediaCounter < myPasos[counter].media.length) {
                          console.log("Media numero: " + mediaCounter + " / " + myPasos[counter].media.length);
                          console.log("Elemento: ", myPasos[counter].media[mediaCounter])
                          let nuevaMultimedia = await multimedia.create({
@@ -763,7 +763,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                }
                console.log("aca arranco la carga de utilizados")
                counter = 0;
-               while(counter < myIngredients.length){
+               while (counter < myIngredients.length) {
                     let elem = myIngredients[counter];
                     let currentId = ingredientIDs[counter];
                     console.log("Creacion utilizado: " + counter + " / " + myIngredients.length)
@@ -783,7 +783,7 @@ app.use('/crearReceta/:idUsuario', async (req, res) => {
                          idUnidad: elem.unidad,  //me la pasas por el front
                          observaciones: '',
                     })
-                    console.log("Creado: " , utilizadoCreado)
+                    console.log("Creado: ", utilizadoCreado)
                     counter = counter + 1;
                }
                res.status(200).json({
@@ -915,10 +915,47 @@ app.use('/recetapersonalizada/:idReceta', async (req, res) => {
 });
 
 
+app.use('/validarfavorito', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               const validadorFavorito = await favorito.findOne({
+                    where: {
+                         idReceta: req.body.data.idReceta,
+                         idUsuario: req.body.data.idUsuario
+                    }
+               })
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
+                    data: validadorFavorito
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+})
+
+
+
 app.use('/favoritos', async (req, res) => {
      try {
           console.log("entre al endpoint de favoritos")
           console.log(req.body.data)
+          if (req.method === 'DELETE') {
+               var usuario = req.body.data.idUsuario
+               var receta = req.body.data.idReceta
+               var query = "delete from adi.favoritos where favoritos.idreceta=" + receta + " and favoritos.idusuario=" + usuario
+               console.log(query);
+               const [results, metadata] = await sequelize.query(
+                    query
+               );
+               res.status(200).json({
+                    message: "Se agrego correctamente a favoritos",
+                    data: results
+               })
+          }
           if (req.method === 'POST') {
                const nuevoFavorito = await favorito.create({
                     idReceta: req.body.data.idReceta,
@@ -926,29 +963,29 @@ app.use('/favoritos', async (req, res) => {
                })
                res.status(200).json({
                     message: "Se agrego correctamente a favoritos",
+                    data: nuevoFavorito
+               })
+          }
+          if (req.method === 'GET') {
+               var filtro = req.body.data.idUsuario
+               var ordenamiento = ') order by recetas.nombre asc'
+               var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario =" + filtro + ordenamiento
+               console.log(query);
+               const [results, metadata] = await sequelize.query(
+                    query
+               );
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
                     data: results
                })
-          } 
-          if( req.method === 'GET'){
-               var filtro =  req.body.data.idUsuario
-               var ordenamiento = ') order by recetas.nombre asc'
-                    var query = "select distinct * from adi.recetas where idreceta in (select idreceta from adi.favoritos where favoritos.idusuario =" + filtro + ordenamiento
-                    console.log(query);
-                    const [results, metadata] = await sequelize.query(
-                         query
-                    );
-                    res.status(200).json({
-                         message: "Busqueda finalizada correctamente",
-                         data: results
-                    })
-               }
           }
-          catch (error) {
-               console.log("Catch error", error)
-               res.status(500).json({
-                    message: 'Ocurrio un error inesperado',
-               })
-          }
+     }
+     catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
 });
 
 
