@@ -500,7 +500,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                let resultadosCreacion = [];
                if (req.body.data.foto == null) { //ver aca si esta bien el if para cuando no cargan foto en la receta
                     resultadosCreacion = await receta.create({
-                         idUsuario: req.params.idUsuario,
+                         idUsuario: req.body.data.idUsuario,
                          nombre: req.body.data.nombre,
                          descripcion: req.body.data.descripcion,
                          foto: null,
@@ -510,7 +510,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                     })
                } else {
                     resultadosCreacion = await receta.create({
-                         idUsuario: req.params.idUsuario,
+                         idUsuario: req.body.data.idUsuario,
                          nombre: req.body.data.nombre,
                          descripcion: req.body.data.descripcion,
                          foto: req.body.data.foto.urlFoto,
@@ -526,7 +526,7 @@ app.use('/receta/:idReceta', async (req, res) => {
                     raw: true,
                     limit: 1,
                     where: {
-                         idUsuario: req.params.idUsuario
+                         idUsuario: req.body.data.idUsuario
                     },
                     order: [['idReceta', 'DESC']]
                })
