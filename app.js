@@ -612,6 +612,27 @@ app.use('/listaIngredientes', async (req, res) => {
      }
 });
 
+//Utilizada en HomeScreen
+app.use('/obtenerRecetasNuevas', async (req, res) => {
+     try {
+          if (req.method === 'GET') {
+               var Ordenamiento = ' order by recetas.idreceta desc';
+               var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, pasos.nropaso, pasos.texto, multimedia.urlcontenido FROM adi.recetas  JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario  JOIN adi.pasos on pasos.idreceta=recetas.idreceta JOIN adi.multimedia on multimedia.idpaso=pasos.idpaso " + Ordenamiento
+               const [results, metadata] = await sequelize.query(
+                    query, {})
+               res.status(200).json({
+                    message: "Busqueda finalizada correctamente",
+                    data: results
+               })
+          }
+     } catch (error) {
+          console.log("Catch error", error)
+          res.status(500).json({
+               message: 'Ocurrio un error inesperado',
+          })
+     }
+});
+
 
 
 
