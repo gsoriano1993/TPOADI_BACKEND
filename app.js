@@ -1007,7 +1007,7 @@ app.use('/busqueda', async (req, res) => {
                     var query = "SELECT distinct recetas.nombre, usuarios.nickname, usuarios.idusuario, recetas.idreceta, recetas.foto FROM adi.recetas JOIN adi.usuarios ON recetas.idusuario = usuarios.idusuario WHERE usuarios.nickname= " + filtro + Ordenamiento
                     console.log(query);
                     const [results, metadata] = await sequelize.query(
-                         query
+                         query,{}
                     );
                     console.log(JSON.stringify(results, null, 2))
                     res.status(200).json({
